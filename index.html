@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeetCode Solution Tracker — FSRS</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0d1117; --surface:#161b22; --surface2:#1c2230; --border:#30363d;
+    --ink:#e6edf3; --ink2:#9aa7b4; --ink3:#6e7681;
+    --green:#39d353; --green-soft:#26a641; --accent:#58a6ff;
+    --amber:#d29922; --red:#f85149; --blue:#58a6ff; --violet:#bc8cff;
+    --radius:10px;
+    --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26a641; --hm4:#39d353;
+    --hb1:#12305a; --hb2:#1b4d8f; --hb3:#2f7fd1; --hb4:#58a6ff;
+    /* derived surfaces & accents (themed) */
+    --sb-thumb:#30363d; --sb-thumb-hover:#484f58;
+    --e-ink:#3fb950; --e-bg:#12261e;
+    --m-ink:#d29922; --m-bg:#2b2413;
+    --h-ink:#f85149; --h-bg:#2d1719;
+    --next-bg:#13291b; --next-line:#1e5e33;
+    --row-border:#21262d; --row-hover:#1a212b; --track-bg:#21262d;
+    --primary:#1f6feb; --primary-hover:#2a7aff; --on-primary:#fff;
+    --tip-bg:#000; --tip-ink:#e6edf3;
+    --tree-line:#2b3340; --node-bar-bg:#0d1117;
+    --wheel-ink:#0d1117;   /* slice labels — dark ink on bright difficulty fills */
+    --grid-line:rgba(48,54,61,.16); --hint-bg:rgba(13,17,23,.7);
+    --cell-outline:rgba(255,255,255,.04);
+    --shadow:rgba(0,0,0,.55);
+    --g1-b:#6e2a2a; --g1-h:#2d1517;
+    --g2-b:#6e5a1e; --g2-h:#2b2413;
+    --g3-b:#1e5e33; --g3-h:#13291b;
+    --g4-b:#274e77; --g4-h:#131f2e;
+    /* problem modal (LeetCode replica) */
+    --overlay:rgba(0,0,0,.6);
+    --m-surface:#1a1a1a; --m-border:#333; --m-ink1:#f5f5f5; --m-ink3:#888;
+    --m-body-ink:#eff1f6bf; --m-link:#5b8ff9;
+    --m-code-bg:rgba(255,255,255,.1); --m-pre-bg:rgba(255,255,255,.06);
+    --m-input-bg:#111; --m-x-hover:rgba(255,255,255,.08);
+    --m-diff-e-ink:#00b8a3; --m-diff-e-bg:rgba(0,184,163,.16);
+    --m-diff-m-ink:#ffb800; --m-diff-m-bg:rgba(255,184,0,.16);
+  }
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#ffffff; --surface:#f6f8fa; --surface2:#eaeef2; --border:#d0d7de;
+    --ink:#1f2328; --ink2:#57606a; --ink3:#8c959f;
+    --green:#1a7f37; --green-soft:#2da44e; --accent:#0969da;
+    --amber:#9a6700; --red:#cf222e; --blue:#0969da; --violet:#8250df;
+    --hm0:#ebedf0; --hm1:#9be9a8; --hm2:#40c463; --hm3:#30a14e; --hm4:#216e39;
+    --hb1:#c6e0ff; --hb2:#8cc2ff; --hb3:#4a9bf5; --hb4:#0969da;
+    --sb-thumb:#d0d7de; --sb-thumb-hover:#afb8c1;
+    --e-ink:#1a7f37; --e-bg:#dafbe1;
+    --m-ink:#9a6700; --m-bg:#fff8c5;
+    --h-ink:#cf222e; --h-bg:#ffebe9;
+    --next-bg:#dafbe1; --next-line:#2da44e;
+    --row-border:#e4e8ed; --row-hover:#f0f3f6; --track-bg:#e4e8ed;
+    --primary:#1f883d; --primary-hover:#1a7f37; --on-primary:#fff;
+    --tip-bg:#24292f; --tip-ink:#ffffff;
+    --tree-line:#c8d1da; --node-bar-bg:#eaeef2;
+    --wheel-ink:#ffffff;   /* light theme's difficulty colours are dark — flip to white */
+    --grid-line:rgba(140,149,159,.18); --hint-bg:rgba(255,255,255,.82);
+    --cell-outline:rgba(27,31,36,.06);
+    --shadow:rgba(31,35,40,.18);
+    --g1-b:#f0b3b8; --g1-h:#ffebe9;
+    --g2-b:#e6cf7a; --g2-h:#fff8c5;
+    --g3-b:#9fdfb0; --g3-h:#dafbe1;
+    --g4-b:#a5c9f0; --g4-h:#ddf4ff;
+    --overlay:rgba(31,35,40,.45);
+    --m-surface:#ffffff; --m-border:#d0d7de; --m-ink1:#1f2328; --m-ink3:#6e7781;
+    --m-body-ink:#3c424b; --m-link:#0969da;
+    --m-code-bg:rgba(27,31,36,.06); --m-pre-bg:rgba(27,31,36,.04);
+    --m-input-bg:#f6f8fa; --m-x-hover:rgba(27,31,36,.06);
+    --m-diff-e-ink:#0b8a7c; --m-diff-e-bg:rgba(0,184,163,.14);
+    --m-diff-m-ink:#a06800; --m-diff-m-bg:rgba(255,184,0,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  /* scrollbars */
+  *{scrollbar-width:thin;scrollbar-color:var(--sb-thumb) transparent}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--sb-thumb);border-radius:6px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--sb-thumb-hover)}
+  aside::-webkit-scrollbar-thumb,.hm-scroll::-webkit-scrollbar-thumb,.table-scroll::-webkit-scrollbar-thumb{border-color:var(--surface)}
+  ::-webkit-scrollbar-corner{background:transparent}
+  body{background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:28px 20px 60px}
+  .layout{max-width:1290px;margin:0 auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:22px;align-items:start}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+  .wrap{min-width:0}
+  /* sidebar */
+  aside{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  @media (max-width:900px){aside{position:static;max-height:340px}}
+  aside h2{font-size:15px;font-weight:600;margin-bottom:2px}
+  aside .sub{margin-bottom:10px}
+  .topic{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 4px}
+  .rec{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:7px;font-size:13px}
+  .rec:hover{background:var(--surface2)}
+  .rec a{color:var(--ink);text-decoration:none;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rec a:hover{color:var(--accent)}
+  .rec .diff,.qtitle .diff{font-size:10px;font-weight:600;border-radius:4px;padding:0 5px}
+  .diff.E{color:var(--e-ink);background:var(--e-bg)} .diff.M{color:var(--m-ink);background:var(--m-bg)} .diff.H{color:var(--h-ink);background:var(--h-bg)}
+  /* difficulty-tinted problem number in the All problems table */
+  td .num{font-weight:600}
+  td .num.E{color:var(--e-ink)} td .num.M{color:var(--m-ink)} td .num.H{color:var(--h-ink)}
+  .rec .radd{background:none;border:1px solid var(--border);border-radius:6px;color:var(--ink2);font-size:12px;line-height:1;padding:3px 7px}
+  .rec .radd:hover{color:var(--green);border-color:var(--green-soft)}
+  .rec.done{opacity:.45}
+  .rec.done a{text-decoration:line-through}
+  .rec.done .exp{opacity:1}
+  .rec .tick{color:var(--green);font-size:13px;width:24px;text-align:center}
+  .rec.next{background:var(--next-bg);outline:1px solid var(--next-line)}
+  .next-tag{font-size:10px;color:var(--green);font-weight:600}
+  .rec .exp{background:var(--surface2);border:1.5px solid var(--accent);color:var(--accent);font-size:14px;font-weight:700;width:24px;height:24px;line-height:1;flex:0 0 auto;padding:0;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:transform .12s,color .12s,border-color .12s,background .12s;box-shadow:0 0 0 1px rgba(88,166,255,.15)}
+  .rec .exp:hover{color:#fff;background:var(--accent);border-color:var(--accent)}
+  .rec .exp.filled{color:var(--green);border-color:var(--green-soft);background:var(--e-bg);box-shadow:0 0 0 1px rgba(57,211,83,.15)}
+  .rec .exp.filled:hover{color:#fff;background:var(--green-soft)}
+  /* problem text modal — LeetCode dark-theme replica */
+  #noteOverlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:50;align-items:center;justify-content:center;padding:24px}
+  #noteOverlay.open{display:flex}
+  #noteModal{background:var(--m-surface);border:1px solid var(--m-border);border-radius:8px;width:min(860px,94vw);height:min(880px,92vh);display:flex;flex-direction:column;padding:0}
+  #noteModal .nm-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--m-border)}
+  #noteModal .nm-head .nm-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+  #noteModal .nm-head h3{font:500 18px/1.3 -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--m-ink1)}
+  #noteModal .nm-head .nm-diff{font-size:13px;font-weight:500;border-radius:21px;padding:3px 12px;white-space:nowrap}
+  #noteModal .nm-diff.E{color:var(--m-diff-e-ink);background:var(--m-diff-e-bg)}
+  #noteModal .nm-diff.M{color:var(--m-diff-m-ink);background:var(--m-diff-m-bg)}
+  #noteModal .nm-head a{color:var(--m-link);font-size:13px;text-decoration:none;white-space:nowrap}
+  #noteModal .nm-head a:hover{text-decoration:underline}
+  #noteModal .nm-head .nm-x{background:none;border:none;color:var(--m-ink3);font-size:20px;line-height:1;padding:2px 6px;border-radius:6px}
+  #noteModal .nm-head .nm-x:hover{color:var(--m-ink1);background:var(--m-x-hover)}
+  #noteModal .nm-body{flex:1;overflow-y:auto;padding:22px 22px 24px}
+  /* LeetCode-style problem statement rendering (dark theme) */
+  .lc-stmt{font:14px/1.6 -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--m-body-ink)}
+  .lc-stmt p{margin:0 0 1em}
+  .lc-stmt ul,.lc-stmt ol{margin:0 0 1em;padding-left:1.5em}
+  .lc-stmt li{margin-bottom:.5em}
+  .lc-stmt code{background:var(--m-code-bg);border-radius:4px;padding:2px 4px;font:.875em/1.4 ui-monospace,Menlo,"SF Mono",Consolas,monospace;color:var(--m-body-ink)}
+  .lc-stmt pre{background:var(--m-pre-bg);border-radius:8px;padding:10px 16px;margin:0 0 1em;overflow-x:auto;font:13px/1.7 ui-monospace,Menlo,"SF Mono",Consolas,monospace;color:var(--m-body-ink);white-space:pre-wrap}
+  .lc-stmt pre code{background:none;padding:0;color:inherit;font-size:13px}
+  /* newer LeetCode statement format: examples come as .example-block instead of <pre> */
+  .lc-stmt .example-block{background:var(--m-pre-bg);border-radius:8px;padding:10px 16px;margin:0 0 1em;overflow-x:auto;font:13px/1.7 ui-monospace,Menlo,"SF Mono",Consolas,monospace;color:var(--m-body-ink)}
+  .lc-stmt .example-block p{margin:0 0 .3em}
+  .lc-stmt .example-block p:last-child{margin-bottom:0}
+  .lc-stmt .example-io{font-family:inherit}
+  .lc-stmt strong{font-weight:700;color:var(--m-ink1)}
+  .lc-stmt strong.example{display:block;margin:1.5em 0 .6em;font-size:15px}
+  .lc-stmt sup{font-size:11px}
+  .lc-stmt a{color:var(--m-link);text-decoration:none}
+  .lc-stmt a:hover{text-decoration:underline}
+  .lc-stmt img{max-width:100%;border-radius:6px;margin:8px 0}
+  .lc-stmt hr{border:none;border-top:1px solid var(--m-border);margin:1.2em 0}
+  .lc-empty{color:var(--m-ink3);font-size:13px;font-style:italic;margin-bottom:16px}
+  .nm-notes-label{font-size:11px;color:var(--m-ink3);text-transform:uppercase;letter-spacing:.5px;margin:22px 0 6px}
+  #noteText{width:100%;min-height:120px;resize:vertical;font:13px/1.6 -apple-system,"Segoe UI",sans-serif;background:var(--m-input-bg);color:var(--m-body-ink);border:1px solid var(--m-border);border-radius:8px;padding:12px 14px}
+  #noteText:focus{outline:none;border-color:var(--m-link)}
+  #recProg{font-size:12px;color:var(--ink2)}
+  h1{font-size:20px;font-weight:700;letter-spacing:-.2px}
+  h1 span{color:var(--green)}
+  .sub{color:var(--ink2);font-size:13px;margin-top:2px}
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+  .hdr-btns{display:flex;gap:8px}
+  .theme-btn{display:flex;align-items:center;gap:6px;padding:6px 10px}
+  .theme-btn .ti{font-size:13px;line-height:1}
+  button{cursor:pointer;font:inherit;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--ink);padding:6px 12px}
+  button:hover{border-color:var(--ink3)}
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+  .tile .k{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px}
+  .tile .v{font-size:26px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .tile .v small{font-size:13px;color:var(--ink2);font-weight:400}
+  /* cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:22px;overflow:hidden}
+  .card h2{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:1px 9px;font-size:12px;color:var(--ink2);font-weight:400}
+  /* heatmap */
+  .hm-scroll{overflow-x:auto;padding-bottom:6px}
+  .hm{display:flex;gap:3px}
+  .hm-col{display:flex;flex-direction:column;gap:3px}
+  .hm-cell{width:11px;height:11px;border-radius:2.5px;background:var(--hm0);outline:1px solid var(--cell-outline);outline-offset:-1px}
+  .hm-cell[data-l="1"]{background:var(--hm1)}
+  .hm-cell[data-l="2"]{background:var(--hm2)}
+  .hm-cell[data-l="3"]{background:var(--hm3)}
+  .hm-cell[data-l="4"]{background:var(--hm4)}
+  .hm-cell[data-b="1"]{background:var(--hb1)}
+  .hm-cell[data-b="2"]{background:var(--hb2)}
+  .hm-cell[data-b="3"]{background:var(--hb3)}
+  .hm-cell[data-b="4"]{background:var(--hb4)}
+  select{font:inherit;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--ink);padding:4px 8px;cursor:pointer;margin-left:auto}
+  .hm-legend{gap:12px}
+  .hm-legend .lg{display:flex;align-items:center;gap:4px}
+  .hm-months{display:flex;font-size:11px;color:var(--ink2);margin-bottom:4px;position:relative;height:14px}
+  .hm-months span{position:absolute}
+  .hm-legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink2);margin-top:8px;justify-content:flex-end}
+  #hmTip{position:fixed;pointer-events:none;background:var(--tip-bg);color:var(--tip-ink);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;display:none;z-index:10;white-space:nowrap}
+  /* review queue */
+  .qcard{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .qtop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .qtitle{font-size:16px;font-weight:600}
+  .qtitle a{color:var(--ink);text-decoration:none}
+  .qtitle a:hover{color:var(--accent)}
+  .qmeta{font-size:12px;color:var(--ink2)}
+  .grades{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .grades button{flex:1;min-width:110px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.25}
+  .grades small{color:var(--ink2);font-size:11px}
+  .g1{border-color:var(--g1-b)}.g1:hover{background:var(--g1-h);border-color:var(--red)}
+  .g2{border-color:var(--g2-b)}.g2:hover{background:var(--g2-h);border-color:var(--amber)}
+  .g3{border-color:var(--g3-b)}.g3:hover{background:var(--g3-h);border-color:var(--green-soft)}
+  .g4{border-color:var(--g4-b)}.g4:hover{background:var(--g4-h);border-color:var(--blue)}
+  .empty{color:var(--ink2);text-align:center;padding:18px 0;font-size:13px}
+  /* review roulette */
+  .wheel-wrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .wheel-side{flex:1;min-width:260px}
+  .wheel-stage{position:relative;width:280px;height:280px;flex:0 0 auto;margin:0 auto}
+  .wheel{width:100%;height:100%;display:block;cursor:pointer;transform-origin:50% 50%;
+    filter:drop-shadow(0 4px 14px var(--shadow))}
+  .wheel .sl{stroke:var(--surface);stroke-width:.6}
+  /* one hue per difficulty; alternating slices only vary in lightness so the
+     difficulty stays readable while neighbours remain distinguishable */
+  .wheel .sl.E{fill:var(--green-soft)}
+  .wheel .sl.M{fill:var(--amber)}
+  .wheel .sl.H{fill:var(--red)}
+  .wheel .sl.U{fill:var(--ink3)}
+  .wheel .sl.alt{fill-opacity:.62}
+  .wheel .sl.hit{stroke:var(--accent);stroke-width:1.6;fill-opacity:1}
+  .wheel .sl-t{fill:var(--wheel-ink);text-anchor:middle;dominant-baseline:middle;
+    font-family:ui-monospace,Consolas,monospace;font-weight:600;pointer-events:none}
+  .wheel-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--ink2);
+    justify-content:center;margin-top:10px}
+  .wheel-legend .wl{display:inline-flex;align-items:center;gap:5px}
+  .wheel-legend .wd{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .wheel-legend .wd.E{background:var(--green-soft)}
+  .wheel-legend .wd.M{background:var(--amber)}
+  .wheel-legend .wd.H{background:var(--red)}
+  .wheel-legend .wd.U{background:var(--ink3)}
+  .wheel-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:74px;height:74px;border-radius:50%;background:var(--surface);
+    border:2px solid var(--border);color:var(--ink);font-size:12px;font-weight:700;
+    letter-spacing:1px;box-shadow:0 2px 10px var(--shadow)}
+  .wheel-hub:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .wheel-hub:disabled{opacity:.6;cursor:default}
+  .wheel-ptr{position:absolute;left:50%;top:-4px;transform:translateX(-50%);z-index:2;
+    width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
+    border-top:16px solid var(--accent);filter:drop-shadow(0 1px 2px var(--shadow))}
+  .spin-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .spin-row button{padding:7px 14px}
+  .spin-hint{font-size:13px;color:var(--ink2)}
+  .spin-live{color:var(--accent)}
+  .spin-hit{animation:spinPop .35s ease-out}
+  @keyframes spinPop{from{transform:scale(.96);opacity:.4}to{transform:scale(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){ .spin-hit{animation:none} }
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--ink2);font-weight:500;text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px}
+  td{padding:7px 10px;border-bottom:1px solid var(--row-border);font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:none}
+  tbody tr{cursor:pointer}
+  tbody tr:hover td{background:var(--row-hover)}
+  .table-scroll{overflow-x:auto}
+  td a{color:var(--ink);text-decoration:none}
+  td a:hover{color:var(--accent)}
+  .due-over{color:var(--red)} .due-today{color:var(--amber)} .due-ok{color:var(--ink2)}
+  .rbar{display:inline-block;width:44px;height:5px;border-radius:3px;background:var(--track-bg);vertical-align:middle;margin-right:6px;overflow:hidden}
+  .rbar i{display:block;height:100%;background:var(--green-soft)}
+  .rev{padding:3px 10px;font-size:12px}
+  .del{background:none;border:none;color:var(--ink3);padding:2px 6px;font-size:14px}
+  .del:hover{color:var(--red)}
+  /* add form */
+  .addrow{display:flex;gap:8px;flex-wrap:wrap}
+  input{font:inherit;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);padding:7px 10px}
+  input:focus{outline:none;border-color:var(--accent)}
+  #addNum{width:90px} #addTitle{flex:1;min-width:180px}
+  .primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+  .primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+  /* curve panel */
+  #curvePanel{display:none}
+  #curvePanel.open{display:block}
+  .curve-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .curve-stats{font-size:12px;color:var(--ink2);display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+  .curve-stats b{color:var(--ink);font-weight:600}
+  svg text{font:11px -apple-system,"Segoe UI",sans-serif;fill:var(--ink2)}
+  /* focus tree */
+  .tree-head{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .tree-head h2{display:flex;align-items:center;gap:8px}
+  .tree-head .chev{margin-left:auto;color:var(--ink3);font-size:12px;transition:transform .15s}
+  .card.open .tree-head .chev{transform:rotate(90deg)}
+  .tree-body{display:none;margin-top:14px}
+  .card.open .tree-body{display:block}
+  .tree-sub{font-size:12px;color:var(--ink2);margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .levelSel{background:var(--surface2);color:var(--ink);border:1px solid var(--border);
+    border-radius:6px;padding:3px 6px;font:inherit;font-size:12px;cursor:pointer}
+  .tree-sub .lgn{display:inline-flex;align-items:center;gap:6px}
+  .tree-sub .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .dot.mastered{background:var(--green-soft)}
+  .dot.progress{background:var(--amber)}
+  .dot.available{background:var(--blue)}
+  .dot.locked{background:var(--border)}
+  /* pan/zoom 2D field */
+  .tree-viewport{position:relative;height:560px;border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--bg);overflow:hidden;cursor:grab;touch-action:none;
+    background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+    background-size:26px 26px}
+  .tree-viewport.grabbing{cursor:grabbing}
+  .tree-canvas{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+  .tree-zoom{position:absolute;right:12px;bottom:12px;z-index:15;display:flex;flex-direction:column;gap:6px}
+  .tree-zoom button{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);
+    border-radius:7px;color:var(--ink);font-size:16px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .tree-zoom button:hover{background:var(--surface2);border-color:var(--ink3)}
+  .tree-zoom .z-lvl{font-size:10px;text-align:center;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .tree-hint{position:absolute;left:12px;bottom:12px;z-index:15;font-size:11px;color:var(--ink3);
+    background:var(--hint-bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;pointer-events:none}
+  .track-box{position:absolute;border:1.5px solid var(--border);border-radius:16px;pointer-events:none}
+  .track-label{position:absolute;display:flex;flex-direction:column;gap:1px;pointer-events:none;z-index:2}
+  .track-label .tl-name{font-size:15px;font-weight:700;letter-spacing:.4px;color:var(--ink)}
+  .track-label .tl-count{font-size:11px;color:var(--ink3)}
+  .td-track{font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 7px;border-radius:20px;text-transform:uppercase}
+  .td-track.t1{color:var(--green);background:rgba(57,211,83,.14)}
+  .td-track.t2{color:var(--amber);background:rgba(210,153,34,.14)}
+  .td-track.t3{color:var(--red);background:rgba(248,81,73,.14)}
+  .tree-svg{position:absolute;inset:0;pointer-events:none;overflow:visible}
+  .tree-svg path{fill:none;stroke:var(--tree-line);stroke-width:1.5}
+  .tree-svg path.lit{stroke:var(--green-soft);stroke-width:1.8}
+  .tree-svg path.flow{stroke:var(--blue);stroke-width:1.8;stroke-dasharray:5 5}
+  .node{position:absolute;width:160px;transform:translate(-50%,-50%);
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:9px 11px;cursor:pointer;user-select:none;
+    transition:border-color .12s,background .12s}
+  .node:hover{border-color:var(--ink3);background:var(--surface2)}
+  .node .n-top{display:flex;align-items:center;gap:8px}
+  .node .n-ic{font-size:17px;line-height:1;filter:grayscale(1) opacity(.55)}
+  .node .n-ttl{font-size:12px;font-weight:600;line-height:1.15;color:var(--ink)}
+  .node .n-bar{height:4px;border-radius:2px;background:var(--node-bar-bg);margin-top:8px;overflow:hidden}
+  .node .n-bar > i{display:block;height:100%;border-radius:2px;background:var(--ink3);width:0}
+  .node .n-meta{display:flex;justify-content:space-between;align-items:center;margin-top:5px;
+    font-size:10px;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .node .n-badge{font-size:10px;font-weight:600;letter-spacing:.3px}
+  /* states */
+  .node.locked{opacity:.5}
+  .node.available{border-color:var(--blue)}
+  .node.available .n-ic{filter:none}
+  .node.available .n-bar > i{background:var(--blue)}
+  .node.available .n-badge{color:var(--blue)}
+  .node.progress{border-color:var(--amber)}
+  .node.progress .n-ic{filter:none}
+  .node.progress .n-bar > i{background:var(--amber)}
+  .node.progress .n-badge{color:var(--amber)}
+  .node.mastered{border-color:var(--green-soft)}
+  .node.mastered .n-ic{filter:none}
+  .node.mastered .n-bar > i{background:var(--green-soft)}
+  .node.mastered .n-badge{color:var(--green-soft)}
+  .node.sel{outline:2px solid var(--accent);outline-offset:1px;z-index:6}
+  .node .n-lock{position:absolute;top:-7px;right:-7px;font-size:11px;
+    background:var(--surface);border:1px solid var(--border);border-radius:50%;
+    width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+  /* detail — floating focus card (HoI4 style) */
+  #treeDetail{display:none;position:absolute;z-index:20;width:380px;max-height:440px;overflow-y:auto;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 12px 34px var(--shadow);padding:14px}
+  #treeDetail .td-head{position:sticky;top:-14px;background:var(--surface);
+    margin:-14px -14px 6px;padding:14px 14px 6px;z-index:1}
+  #treeDetail.open{display:block}
+  #treeDetail::before{content:"";position:absolute;top:-7px;left:var(--arrow,50%);
+    width:12px;height:12px;background:var(--surface);border-left:1px solid var(--border);
+    border-top:1px solid var(--border);transform:translateX(-50%) rotate(45deg)}
+  #treeDetail .td-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  #treeDetail .td-head h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+  #treeDetail .td-head .td-x{background:none;border:1px solid var(--border);border-radius:6px;
+    color:var(--ink2);font-size:13px;line-height:1;padding:3px 8px;cursor:pointer}
+  #treeDetail .td-head .td-x:hover{color:var(--ink);border-color:var(--ink3)}
+  #treeDetail .td-desc{font-size:12px;line-height:1.5;color:var(--ink2);margin-bottom:10px}
+  #treeDetail .td-sec{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);
+    margin:0 0 6px;display:flex;align-items:center;gap:8px}
+  #treeDetail .td-badge{font-size:11px;text-transform:none;letter-spacing:0;color:var(--ink2)}
+  #treeDetail .td-ex{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:4px}
+  #treeDetail .td-ex li{font-size:12px;color:var(--ink);padding-left:16px;position:relative;line-height:1.4}
+  #treeDetail .td-ex li::before{content:"›";position:absolute;left:4px;color:var(--accent);font-weight:700}
+  #treeDetail .td-code{margin-bottom:10px}
+  #treeDetail .td-cap{display:block;font-size:11px;color:var(--ink2);margin-bottom:4px}
+  #treeDetail .td-code pre{background:var(--bg);border:1px solid var(--border);border-radius:6px;
+    padding:8px 10px;overflow-x:auto}
+  #treeDetail .td-code code{font:12px/1.5 "SF Mono",Consolas,"Roboto Mono",monospace;color:var(--ink);white-space:pre}
+  #treeDetail .td-list{display:flex;flex-direction:column;gap:4px}
+  /* ---- monthly badges (under the activity heatmap) ---- */
+  .mbadges{display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:8px;margin-top:14px;
+    padding-top:14px;border-top:1px solid var(--row-border)}
+  .mb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px 9px;border-radius:9px;
+    border:1px solid var(--amber);background:linear-gradient(180deg,rgba(210,153,34,.14),transparent);
+    cursor:default;position:relative}
+  .mb .mb-ic{font-size:19px;line-height:1}
+  .mb .mb-m{font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--amber)}
+  .mb .mb-n{font-size:10px;color:var(--amber);font-variant-numeric:tabular-nums;opacity:.8}
+  /* ---- achievements ---- */
+  .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+  .ach{border:1px solid var(--border);border-radius:9px;background:var(--bg);padding:10px 11px;
+    display:flex;flex-direction:column;gap:6px}
+  .ach .a-top{display:flex;align-items:center;gap:8px}
+  .ach .a-ic{font-size:19px;line-height:1;filter:grayscale(1) opacity(.4)}
+  .ach .a-name{font-size:12px;font-weight:600;color:var(--ink2);line-height:1.2}
+  .ach .a-desc{font-size:11px;color:var(--ink3);line-height:1.35}
+  .ach .a-bar{height:4px;border-radius:2px;background:var(--track-bg);overflow:hidden}
+  .ach .a-bar > i{display:block;height:100%;background:var(--ink3);width:0}
+  .ach .a-foot{display:flex;justify-content:space-between;align-items:center;font-size:10px;
+    color:var(--ink3);font-variant-numeric:tabular-nums}
+  .ach.locked{opacity:.72}
+  .ach.close .a-bar > i{background:var(--blue)}
+  .ach.done{border-color:var(--green-soft);background:linear-gradient(180deg,rgba(57,211,83,.09),transparent)}
+  .ach.done .a-ic{filter:none}
+  .ach.done .a-name{color:var(--ink)}
+  .ach.done .a-bar > i{background:var(--green-soft)}
+  .ach.done .a-foot{color:var(--green-soft)}
+  .ach-group{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px}
+  .ach-group:first-child{margin-top:0}
+  footer{color:var(--ink3);font-size:12px;text-align:center;margin-top:10px}
+</style>
+<script>
+/* theme — applied before first paint so there is no flash of the wrong theme */
+(function(){
+  var TKEY = "lc-fsrs-theme";
+  function stored(){ try{ return localStorage.getItem(TKEY); }catch(e){ return null; } }
+  function prefersLight(){
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+  }
+  window.currentTheme = function(){
+    return stored() || (prefersLight() ? "light" : "dark");
+  };
+  window.applyTheme = function(t){
+    document.documentElement.setAttribute("data-theme", t);
+    var b = document.getElementById("themeBtn");
+    if (b){
+      b.innerHTML = t === "light"
+        ? '<span class="ti">☾</span>Dark'
+        : '<span class="ti">☀</span>Light';
+      b.setAttribute("aria-pressed", t === "light" ? "true" : "false");
+      b.title = t === "light" ? "Switch to dark theme" : "Switch to light theme";
+    }
+  };
+  window.toggleTheme = function(){
+    var t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    try{ localStorage.setItem(TKEY, t); }catch(e){}
+    window.applyTheme(t);
+  };
+  window.applyTheme(window.currentTheme());
+  // no explicit choice yet → follow the OS
+  if (window.matchMedia){
+    window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", function(){
+      if (!stored()) window.applyTheme(window.currentTheme());
+    });
+  }
+})();
+</script>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <h2>Roadmap</h2>
+  <div class="sub" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <label style="font-size:12px;color:var(--ink3)">Level</label>
+    <select class="levelSel" onchange="setLevel(this.value)">
+      <option value="1">Beginner</option>
+      <option value="2">Intermediate</option>
+      <option value="3">Advanced</option>
+    </select>
+  </div>
+  <div class="sub"><span id="recProg"></span></div>
+  <div id="recList"></div>
+</aside>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>LeetCode Solution Tracker <span>· FSRS</span></h1>
+      <div class="sub">Spaced repetition with the FSRS forgetting-curve model — review before you forget.</div>
+    </div>
+    <div class="hdr-btns">
+      <button id="themeBtn" class="theme-btn" title="Toggle light / dark theme" aria-pressed="false"></button>
+      <button id="exportBtn">Export</button>
+      <button id="importBtn">Import</button>
+      <button id="syncBtn" title="Sync data with private GitHub repo">Sync</button>
+      <input type="file" id="importFile" accept=".json" style="display:none">
+    </div>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="card" id="treePanel">
+    <div class="tree-head" onclick="toggleTree()">
+      <h2>Focus Tree <span class="badge" id="treeProg"></span></h2>
+      <span class="chev">▶</span>
+    </div>
+    <div class="tree-body">
+      <div class="tree-sub">
+        <span>The full map — solve a topic to unlock what it feeds into. Detached branches stand alone. Click a node for details.</span>
+      </div>
+      <div class="tree-viewport" id="treeViewport">
+        <div class="tree-canvas" id="treeCanvas">
+          <svg class="tree-svg" id="treeSvg"></svg>
+          <div id="treeDetail"></div>
+        </div>
+        <div class="tree-hint">Drag to pan · scroll to zoom</div>
+        <div class="tree-zoom">
+          <button onclick="treeZoomBtn(1)" title="Zoom in">+</button>
+          <button onclick="treeZoomBtn(-1)" title="Zoom out">−</button>
+          <button onclick="treeReset()" title="Reset view" style="font-size:13px">⤢</button>
+          <div class="z-lvl" id="zLvl">100%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Activity <span class="badge" id="yearTotal"></span><select id="yearSel"></select></h2>
+    <div class="hm-scroll">
+      <div class="hm-months" id="hmMonths"></div>
+      <div class="hm" id="hm"></div>
+    </div>
+    <div class="hm-legend">
+      <span class="lg">Done
+        <span class="hm-cell" data-l="1"></span><span class="hm-cell" data-l="2"></span><span class="hm-cell" data-l="3"></span><span class="hm-cell" data-l="4"></span>
+      </span>
+      <span class="lg">Scheduled
+        <span class="hm-cell" data-b="1"></span><span class="hm-cell" data-b="2"></span><span class="hm-cell" data-b="3"></span><span class="hm-cell" data-b="4"></span>
+      </span>
+    </div>
+    <div class="mbadges" id="mBadges"></div>
+  </div>
+
+  <div class="card" id="achPanel">
+    <div class="tree-head" onclick="toggleAch()">
+      <h2>Achievements <span class="badge" id="achCount"></span></h2>
+      <span class="chev">▶</span>
+    </div>
+    <div class="tree-body"><div id="achList"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Due for review <span class="badge" id="dueCount"></span></h2>
+    <div id="queue"></div>
+  </div>
+
+  <div class="card">
+    <h2>Review roulette <span class="badge" id="spinCount"></span></h2>
+    <div id="roulette"></div>
+  </div>
+
+  <div class="card" id="curvePanel">
+    <div class="curve-head"><h2 id="curveTitle"></h2><button id="curveClose">Close</button></div>
+    <div class="curve-stats" id="curveStats"></div>
+    <div style="overflow-x:auto"><svg id="curveSvg" width="920" height="200" viewBox="0 0 920 200"></svg></div>
+  </div>
+
+  <div class="card">
+    <h2>Add solved problem</h2>
+    <div class="addrow">
+      <input id="addNum" type="number" min="1" placeholder="#">
+      <input id="addTitle" type="text" placeholder="Title (e.g. Two Sum)">
+      <button class="primary" id="addBtn">Add — solved today</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>All problems <span class="badge" id="allCount"></span></h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>#</th><th>Title</th><th>Recall now</th><th>Stability</th><th>Next review</th><th>Reps</th><th>Lapses</th><th></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+  </div>
+
+  <footer>FSRS-5 scheduler · target retention 95% · max interval 60d · data lives in this browser (localStorage) — Sync pushes it to your private GitHub repo</footer>
+</div>
+</div>
+<div id="hmTip"></div>
+<div id="noteOverlay" onclick="if(event.target===this) closeNote()">
+  <div id="noteModal">
+    <div class="nm-head">
+      <div class="nm-title"><h3 id="noteTitle"></h3><span id="noteDiff" class="nm-diff"></span></div>
+      <div style="display:flex;align-items:center;gap:14px"><a id="noteLink" target="_blank" rel="noopener">Open on LeetCode ↗</a> <button class="nm-x" onclick="closeNote()" title="Close (Esc)">✕</button></div>
+    </div>
+    <div class="nm-body">
+      <div id="noteStmt" class="lc-stmt"></div>
+      <div class="nm-notes-label">Your notes</div>
+      <textarea id="noteText" placeholder="Add your own notes, gotchas, or a paste of the statement if it's missing above..."></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================== FSRS-5 ===================== */
+const W = [0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,
+           0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621];
+const DECAY = -0.5, FACTOR = Math.pow(0.9, 1/DECAY) - 1; // = 19/81
+const TARGET_R = 0.95;   // higher retention → shorter intervals, more frequent reviews
+const MAX_IVL = 60;      // days — never schedule further out than this
+const clamp = (x,lo,hi)=>Math.min(hi,Math.max(lo,x));
+
+const retrievability = (days,S)=> Math.pow(1 + FACTOR*days/Math.max(S,0.01), DECAY);
+const nextInterval = S => clamp(Math.round(S/FACTOR*(Math.pow(TARGET_R,1/DECAY)-1)), 1, MAX_IVL);
+const initDifficulty = g => clamp(W[4] - Math.exp(W[5]*(g-1)) + 1, 1, 10);
+const initStability  = g => Math.max(W[g-1], 0.1);
+
+function nextDifficulty(D,g){
+  const d = D - W[6]*(g-3);
+  return clamp(W[7]*initDifficulty(4) + (1-W[7])*d, 1, 10);
+}
+function stabilityRecall(D,S,R,g){
+  const hard = g===2 ? W[15] : 1;
+  const easy = g===4 ? W[16] : 1;
+  return S*(Math.exp(W[8]) * (11-D) * Math.pow(S,-W[9]) * (Math.exp(W[10]*(1-R))-1) * hard * easy + 1);
+}
+function stabilityForget(D,S,R){
+  const s = W[11]*Math.pow(D,-W[12])*(Math.pow(S+1,W[13])-1)*Math.exp(W[14]*(1-R));
+  return Math.min(Math.max(s,0.1), S);
+}
+// pure preview/apply. card:{S,D,last(ms),due(ms),reps,lapses}
+function schedule(card, g, nowMs){
+  const days = Math.max(0, (nowMs - card.last)/864e5);
+  const R = retrievability(days, card.S);
+  const c = {...card};
+  if (g===1){ c.S = stabilityForget(c.D,c.S,R); c.lapses++; }
+  else      { c.S = stabilityRecall(c.D,c.S,R,g); }
+  c.D = nextDifficulty(c.D, g);
+  const ivl = g===1 ? 1 : nextInterval(c.S);
+  c.last = nowMs; c.due = nowMs + ivl*864e5; c.reps++; c.ivl = ivl;
+  return c;
+}
+function newCard(g, whenMs){
+  const S = initStability(g), ivl = nextInterval(S);
+  return {S, D:initDifficulty(g), last:whenMs, due:whenMs+ivl*864e5, reps:1, lapses:0, ivl};
+}
+
+/* ===================== state ===================== */
+const KEY = "lc-fsrs-tracker-v1";
+const dkey = d => { const x=new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const slug = t => t.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,"").replace(/\s+/g,"-");
+let state;
+
+function seed(){
+  const y = new Date(); y.setDate(y.getDate()-1); y.setHours(10,0,0,0);
+  const ym = y.getTime(), yk = dkey(y);
+  const mk = (num,title)=>({num,title,url:"https://leetcode.com/problems/"+slug(title)+"/",added:ym,card:newCard(3,ym),history:[{t:ym,g:3}]});
+  return {
+    problems:[ mk(1,"Two Sum"), mk(217,"Contains Duplicate"), mk(242,"Valid Anagram") ],
+    activity:{ [yk]:3 },
+    notes:{},
+    badges:{},  // achievement id -> first-earned timestamp
+    spins:0     // review-roulette problems re-solved
+  };
+}
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(!d.notes) d.notes={}; if(!d.badges) d.badges={}; if(typeof d.spins!=="number") d.spins=0; return d; } }catch(e){}
+  return seed();
+}
+const save = ()=>{ localStorage.setItem(KEY, JSON.stringify(state)); ghPush(); };
+state = load();
+
+/* GitHub sync — data.json in private repo. Remote wins on open, local wins on save.
+   ponytail: last-write-wins, no merge; add updated-at compare if two machines edit offline */
+const GH = { KEY:"lc-gh-sync", REPO:"JustinasLa/leetcode-tracker", PATH:"data.json", sha:null, t:0 };
+const ghCfg = ()=>{ try{ return JSON.parse(localStorage.getItem(GH.KEY)||"null"); }catch(e){ return null; } };
+const ghUrl = c=>`https://api.github.com/repos/${c.repo}/contents/${GH.PATH}`;
+const ghHdr = c=>({ Authorization:"Bearer "+c.token, Accept:"application/vnd.github+json" });
+const ghStatus = m=>{ const b=document.getElementById("syncBtn"); if(b) b.textContent=m; };
+async function ghPull(){
+  const c=ghCfg(); if(!c) return;
+  ghStatus("Sync…");
+  try{
+    const r=await fetch(ghUrl(c),{headers:ghHdr(c),cache:"no-store"});
+    if(r.status===404){ GH.sha=null; ghStatus("Sync ✓"); ghPush(); return; }
+    if(!r.ok) throw new Error(r.status);
+    const j=await r.json(); GH.sha=j.sha;
+    const d=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(j.content.replace(/
+/g,"")),ch=>ch.charCodeAt(0))));
+    if(Array.isArray(d.problems)){ state=d; localStorage.setItem(KEY, JSON.stringify(state)); if(typeof renderAll==="function") renderAll(); }
+    ghStatus("Sync ✓");
+  }catch(e){ ghStatus("Sync ✗"); console.error("gh pull",e); }
+}
+function ghPush(){
+  const c=ghCfg(); if(!c) return;
+  clearTimeout(GH.t);
+  GH.t=setTimeout(async()=>{
+    ghStatus("Sync…");
+    try{
+      const body={ message:"tracker: update data", content:btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2)))) };
+      if(GH.sha) body.sha=GH.sha;
+      const r=await fetch(ghUrl(c),{method:"PUT",headers:ghHdr(c),body:JSON.stringify(body)});
+      if(!r.ok) throw new Error(r.status);
+      GH.sha=(await r.json()).content.sha; ghStatus("Sync ✓");
+    }catch(e){ ghStatus("Sync ✗"); console.error("gh push",e); }
+  },1500);
+}
+ghPull();
+// re-derive due dates from stability so retention/interval changes apply to existing cards
+for (const p of state.problems){
+  const c=p.card, ivl=nextInterval(c.S);
+  const due=c.last+ivl*864e5;
+  if (due<c.due){ c.due=due; c.ivl=ivl; }
+}
+save();
+
+/* ===================== render ===================== */
+const $ = id => document.getElementById(id);
+const fmtDate = ms => new Date(ms).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+const startOfDay = ms => { const d=new Date(ms); d.setHours(0,0,0,0); return d.getTime(); };
+
+function dueInfo(p){
+  const today = startOfDay(Date.now()), dd = startOfDay(p.card.due);
+  const diff = Math.round((dd-today)/864e5);
+  if (diff<0)  return {cls:"due-over", txt:Math.abs(diff)+"d overdue", due:true};
+  if (diff===0)return {cls:"due-today",txt:"today", due:true};
+  return {cls:"due-ok", txt:"in "+diff+"d ("+fmtDate(p.card.due)+")", due:false};
+}
+const recallNow = p => retrievability(Math.max(0,(Date.now()-p.card.last)/864e5), p.card.S);
+
+function streak(){
+  let s=0; const d=new Date();
+  if (!state.activity[dkey(d)]) d.setDate(d.getDate()-1); // today not yet active → count from yesterday
+  while (state.activity[dkey(d)]) { s++; d.setDate(d.getDate()-1); }
+  return s;
+}
+
+function renderTiles(){
+  const due = state.problems.filter(p=>dueInfo(p).due).length;
+  const avgR = state.problems.length
+    ? Math.round(state.problems.reduce((a,p)=>a+recallNow(p),0)/state.problems.length*100) : 100;
+  $("tiles").innerHTML = `
+    <div class="tile"><div class="k">Solved</div><div class="v">${state.problems.length}</div></div>
+    <div class="tile"><div class="k">Due now</div><div class="v" style="color:${due?"var(--amber)":"var(--green)"}">${due}</div></div>
+    <div class="tile"><div class="k">Streak</div><div class="v">${streak()} <small>days</small></div></div>
+    <div class="tile"><div class="k">Avg recall</div><div class="v">${avgR}<small>%</small></div></div>
+    <div class="tile"><div class="k">Badges</div><div class="v" id="badgeTile">—</div></div>`;
+}
+
+/* ---- heatmap: forward calendar, current week = first column ---- */
+function forecastCounts(horizonMs){
+  // project each problem's review dates ahead, assuming "Good" each time
+  const counts={};
+  const today = startOfDay(Date.now());
+  for (const p of state.problems){
+    let c={...p.card}, guard=0;
+    while (c.due<=horizonMs && guard++<120){
+      const dueDay=Math.max(startOfDay(c.due), today); // overdue lands today
+      const k=dkey(dueDay);
+      counts[k]=(counts[k]||0)+1;
+      c=schedule(c,3,Math.max(c.due,Date.now()));
+    }
+  }
+  return counts;
+}
+let hmYear = new Date().getFullYear();
+function renderYearOptions(){
+  const cur = new Date().getFullYear();
+  let min = cur;
+  for (const k of Object.keys(state.activity)){ const y=+k.slice(0,4); if(y<min) min=y; }
+  const sel=$("yearSel"); sel.innerHTML="";
+  for (let y=min; y<=cur+1; y++){
+    const o=document.createElement("option"); o.value=y; o.textContent=y;
+    if (y===hmYear) o.selected=true; sel.appendChild(o);
+  }
+  sel.onchange=()=>{ hmYear=+sel.value; renderHeatmap(); renderMonthBadges(); };
+}
+function renderHeatmap(){
+  renderYearOptions();
+  const hm=$("hm"), months=$("hmMonths"); hm.innerHTML=""; months.innerHTML="";
+  const today = new Date(); today.setHours(0,0,0,0);
+  const jan1 = new Date(hmYear,0,1), dec31 = new Date(hmYear,11,31);
+  const start = new Date(jan1); start.setDate(start.getDate() - start.getDay()); // Sunday on/before Jan 1
+  const weeks = Math.ceil(((dec31 - start)/864e5 + 1)/7);
+  const done = state.activity;
+  const sched = dec31>=today ? forecastCounts(dec31.getTime()) : {};
+  const maxD = Math.max(1, ...Object.values(done).map(Number), 1);
+  const maxS = Math.max(1, ...Object.values(sched).map(Number), 1);
+  const lvl=(c,m)=> !c?0 : Math.min(4, Math.ceil(c/m*4));
+  let totD=0, totS=0, lastMonth=-1;
+  const CELL=14; // 11px + 3 gap
+  for (let w=0; w<weeks; w++){
+    const col=document.createElement("div"); col.className="hm-col";
+    for (let d=0; d<7; d++){
+      const day=new Date(start); day.setDate(start.getDate()+w*7+d);
+      const cell=document.createElement("span"); cell.className="hm-cell";
+      const k=dkey(day);
+      if (day<jan1 || day>dec31){ cell.style.visibility="hidden"; }
+      else {
+        const dateTxt = day.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+        if (day<today){
+          const c=done[k]||0; totD+=c;
+          cell.dataset.l=lvl(c,maxD);
+          cell.dataset.tip=(c? c+" done" : "No activity")+" · "+dateTxt;
+        } else {
+          const s=sched[k]||0, c=done[k]||0; totS+=s; totD+=c;
+          if (s) cell.dataset.b=lvl(s,maxS);
+          else if (c) cell.dataset.l=lvl(c,maxD);
+          const parts=[]; if(c) parts.push(c+" done"); if(s) parts.push(s+" scheduled");
+          cell.dataset.tip=(parts.length?parts.join(", "):"Nothing scheduled")+" · "+dateTxt;
+        }
+        if (+day===+today) cell.style.outline="1px solid var(--accent)";
+      }
+      col.appendChild(cell);
+      if (d===0){
+        const labelDay = day<jan1 ? jan1 : day;
+        if (labelDay<=dec31 && labelDay.getMonth()!==lastMonth){
+          lastMonth=labelDay.getMonth();
+          const m=document.createElement("span"); m.style.left=(w*CELL)+"px";
+          m.textContent=labelDay.toLocaleDateString(undefined,{month:"short"}); months.appendChild(m);
+        }
+      }
+    }
+    hm.appendChild(col);
+  }
+  $("yearTotal").textContent = totD+" done · "+totS+" scheduled in "+hmYear;
+  const tip=$("hmTip");
+  hm.onmousemove = e=>{
+    const t=e.target.dataset&&e.target.dataset.tip;
+    if(t){ tip.style.display="block"; tip.textContent=t;
+      tip.style.left=Math.min(e.clientX+12, innerWidth-tip.offsetWidth-8)+"px";
+      tip.style.top=(e.clientY-34)+"px";
+    } else tip.style.display="none";
+  };
+  hm.onmouseleave = ()=> tip.style.display="none";
+}
+
+/* ===================== badges & achievements ===================== */
+const DAILY_GOAL = 3;   // new problems per day the roadmap suggests
+const daysInMonth = (y,m)=> new Date(y,m+1,0).getDate();
+
+// activity summary for one calendar month
+function monthStats(y,m){
+  const dim=daysInMonth(y,m), now=new Date();
+  const isCur = y===now.getFullYear() && m===now.getMonth();
+  const isFuture = y>now.getFullYear() || (y===now.getFullYear() && m>now.getMonth());
+  const denom = isCur ? now.getDate() : dim;   // in-progress month is judged on elapsed days
+  let days=0, total=0;
+  for (let d=1; d<=dim; d++){
+    const c=state.activity[dkey(new Date(y,m,d))]||0;
+    if (c){ days++; total+=c; }
+  }
+  return {y,m,dim,denom,days,total,isCur,isFuture};
+}
+// tracking started July 2026 — nothing before that is a real gap, so it isn't shown
+const TRACK_START = {y:2026, m:6};
+function renderMonthBadges(){
+  const box=$("mBadges"); if(!box) return;
+  const now=new Date(), curY=now.getFullYear(), curM=now.getMonth();
+  const first = hmYear===TRACK_START.y ? TRACK_START.m : (hmYear>TRACK_START.y ? 0 : 12);
+  const last  = hmYear===curY ? curM : (hmYear<curY ? 11 : -1);
+  const cells=[];
+  for (let m=first; m<=last; m++){
+    const s=monthStats(hmYear,m);
+    if (s.days<s.dim) continue;   // gold only — every single day of the full month
+    const name=new Date(hmYear,m,1).toLocaleDateString(undefined,{month:"long"});
+    const tip = `${name} ${hmYear} — active all ${s.dim} days · ${s.total} actions`;
+    cells.push(`<div class="mb t3" title="${tip}">
+      <span class="mb-ic">🥇</span>
+      <span class="mb-m">${name}</span>
+      <span class="mb-n">${s.dim}/${s.dim} days</span>
+    </div>`);
+  }
+  box.innerHTML = cells.join("");
+  box.style.display = cells.length ? "" : "none";
+}
+
+// longest run of consecutive active days across all recorded activity
+function bestStreak(){
+  const keys=Object.keys(state.activity).filter(k=>state.activity[k]).sort();
+  let best=0, run=0, prev=null;
+  for (const k of keys){
+    const [y,m,d]=k.split("-").map(Number);
+    const t=new Date(y,m-1,d).getTime();
+    run = (prev!==null && Math.round((t-prev)/864e5)===1) ? run+1 : 1;
+    prev=t; if (run>best) best=run;
+  }
+  return best;
+}
+function perfectMonths(){
+  const seen=new Set();
+  for (const k of Object.keys(state.activity)) if (state.activity[k]) seen.add(k.slice(0,7));
+  let n=0;
+  for (const ym of seen){
+    const [y,m]=ym.split("-").map(Number);
+    const s=monthStats(y,m-1);
+    if (!s.isCur && s.days>=s.dim) n++;
+  }
+  return n;
+}
+function topicsMastered(){
+  const done=new Set(state.problems.map(p=>p.num));
+  let n=0;
+  for (const [,items] of RECS) if (items.length && items.every(it=>done.has(it[0]))) n++;
+  return n;
+}
+function badgeStats(){
+  const solved=state.problems.length;
+  const reviews=state.problems.reduce((a,p)=>a+Math.max(0,p.card.reps-1),0);
+  const lapses=state.problems.reduce((a,p)=>a+p.card.lapses,0);
+  const byDiff=d=>state.problems.filter(p=>diffOf(p.num)===d).length;
+  const activeDays=Object.keys(state.activity).filter(k=>state.activity[k]).length;
+  const bigDays=Object.values(state.activity).filter(c=>c>=DAILY_GOAL).length;
+  const mature=state.problems.filter(p=>p.card.S>=21).length;
+  const avgR=solved ? state.problems.reduce((a,p)=>a+recallNow(p),0)/solved : 0;
+  return {solved, reviews, lapses, activeDays, bigDays, mature, avgR,
+    easy:byDiff("E"), med:byDiff("M"), hard:byDiff("H"),
+    streak:streak(), best:bestStreak(), perfect:perfectMonths(), topics:topicsMastered(),
+    totalTopics:RECS.length};
+}
+// goal = threshold on the stat named by `st`; unlocked when val >= goal
+const ACHS = [
+  ["Solving", [
+    ["first",     "🌱","First Blood",   "Track your first problem",        "solved", 1],
+    ["solve10",   "📗","Getting Going", "10 problems tracked",             "solved", 10],
+    ["solve50",   "📘","Half Century",  "50 problems tracked",             "solved", 50],
+    ["solve100",  "📕","Centurion",     "100 problems tracked",            "solved", 100],
+    ["solve150",  "🏛️","NeetCode 150",  "150 problems tracked",            "solved", 150],
+    ["med25",     "🟡","Mid Game",      "25 mediums solved",               "med",    25],
+    ["hard1",     "🔴","Into the Deep", "First hard solved",               "hard",   1],
+    ["hard10",    "💀","Hard Mode",     "10 hards solved",                 "hard",   10],
+    ["topic1",    "🧩","Topic Cleared", "Finish every problem in a topic", "topics", 1],
+    ["topic5",    "🗺️","Cartographer",  "Clear 5 topics",                  "topics", 5]
+  ]],
+  ["Consistency", [
+    ["streak3",   "🔥","Warming Up",    "3-day streak",                    "best",   3],
+    ["streak7",   "📅","Full Week",     "7-day streak",                    "best",   7],
+    ["streak30",  "🗓️","Month Strong",  "30-day streak",                   "best",   30],
+    ["streak100", "💯","Unbroken",      "100-day streak",                  "best",   100],
+    ["month1",    "🥇","Perfect Month", "Active every day of a month",     "perfect",1],
+    ["month3",    "👑","Triple Crown",  "3 perfect months",                "perfect",3],
+    ["days50",    "⛳","Regular",       "50 active days",                  "activeDays",50],
+    ["goal10",    "⚡","Goal Getter",   `Hit the ${DAILY_GOAL}/day goal 10 times`,"bigDays",10]
+  ]],
+  ["Retention", [
+    ["rev25",     "🔁","Repeat Offender","25 reviews completed",           "reviews",25],
+    ["rev100",    "🧠","Memory Athlete", "100 reviews completed",          "reviews",100],
+    ["mature10",  "🌳","Deep Roots",     "10 cards with 21d+ stability",   "mature", 10],
+    ["lapse10",   "🩹","Trial by Fire",  "Recover from 10 lapses",         "lapses", 10]
+  ]]
+];
+function renderBadges(){
+  renderMonthBadges();
+  const s=badgeStats();
+  let unlocked=0, total=0, html="";
+  const nowTs=Date.now(); let dirty=false;
+  for (const [group,list] of ACHS){
+    html+=`<div class="ach-group">${group}</div><div class="ach-grid">`;
+    for (const [id,ic,name,desc,st,goal] of list){
+      total++;
+      const val=Math.min(s[st]||0, goal), done=val>=goal;
+      if (done){
+        unlocked++;
+        if (!state.badges[id]){ state.badges[id]=nowTs; dirty=true; }
+      }
+      const pct=Math.round(val/goal*100);
+      const cls=["ach", done?"done":"locked", !done&&pct>=60?"close":""].filter(Boolean).join(" ");
+      const foot = done
+        ? `<span>Earned</span><span>${fmtDate(state.badges[id])}</span>`
+        : `<span>${val}/${goal}</span><span>${pct}%</span>`;
+      html+=`<div class="${cls}" title="${desc}">
+        <div class="a-top"><span class="a-ic">${ic}</span><span class="a-name">${name}</span></div>
+        <div class="a-desc">${desc}</div>
+        <div class="a-bar"><i style="width:${pct}%"></i></div>
+        <div class="a-foot">${foot}</div>
+      </div>`;
+    }
+    html+=`</div>`;
+  }
+  if (dirty) save();
+  $("achList").innerHTML=html;
+  $("achCount").textContent = unlocked+"/"+total+" earned";
+  const t=$("badgeTile"); if (t) t.innerHTML = unlocked+`<small>/${total}</small>`;
+}
+
+const GNAME=["","Again","Hard","Good","Easy"];
+function renderQueue(){
+  const q = state.problems.filter(p=>dueInfo(p).due)
+    .sort((a,b)=>a.card.due-b.card.due);
+  $("dueCount").textContent = q.length ? q.length+" waiting" : "all clear";
+  if (!q.length){ $("queue").innerHTML = `<div class="empty">Nothing due. Come back when the forgetting curve says so. 🎉</div>`; return; }
+  $("queue").innerHTML = q.map(p=>{
+    const r=Math.round(recallNow(p)*100), di=dueInfo(p);
+    const now=Date.now();
+    const btns=[1,2,3,4].map(g=>{
+      const prev=schedule(p.card,g,now);
+      return `<button class="g${g}" onclick="rate(${p.num},${g})">${GNAME[g]}<small>${prev.ivl}d</small></button>`;
+    }).join("");
+    return `<div class="qcard">
+      <div class="qtop">
+        <div class="qtitle"><a href="${p.url}" target="_blank" rel="noopener">${p.num}. ${p.title}</a></div>
+        <div class="qmeta"><span class="${di.cls}">${di.txt}</span> · est. recall ${r}%</div>
+      </div>
+      <div class="grades">${btns}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ---- review roulette ----
+   A real wheel: every problem that is NOT currently due gets a slice. Landing on
+   one costs nothing — re-solving it counts as activity but never reschedules the
+   card, so a spin can only help you and there is no decision to agonise over. */
+let spinPick = null;    // problem num the wheel landed on
+let spinRot  = 0;       // absolute wheel rotation in degrees (keeps growing)
+let spinning = false;   // wheel mid-animation — don't rebuild it underneath
+let spinTimer = null;
+
+const DIFFS = {E:1, M:1, H:1};
+const wheelDiff = num => DIFFS[diffOf(num)] ? diffOf(num) : "U";
+// slices run clockwise in ascending problem number
+const spinPool = ()=> state.problems.filter(p=>!dueInfo(p).due).sort((a,b)=>a.num-b.num);
+const SPIN_MS = 4600;
+
+/* point on the wheel edge at `deg` clockwise from 12 o'clock */
+function wheelXY(deg, r){
+  const t = (deg-90) * Math.PI/180;
+  return [(r*Math.cos(t)).toFixed(2), (r*Math.sin(t)).toFixed(2)];
+}
+function sliceHtml(i, n, p){
+  const a = 360/n, a0 = i*a, a1 = a0+a, R = 100;
+  const d = wheelDiff(p.num);
+  const cls = `sl ${d}${i%2 ? " alt" : ""}${p.num===spinPick ? " hit" : ""}`;
+  const dName = d==="E"?"Easy":d==="M"?"Medium":d==="H"?"Hard":"Unrated";
+  const tip = `${p.num}. ${p.title} · ${dName}`;
+  let path;
+  if (n===1){
+    path = `<circle class="${cls}" cx="0" cy="0" r="${R}"><title>${tip}</title></circle>`;
+  } else {
+    const [x0,y0]=wheelXY(a0,R), [x1,y1]=wheelXY(a1,R);
+    path = `<path class="${cls}" d="M0 0 L${x0} ${y0} A${R} ${R} 0 ${a>180?1:0} 1 ${x1} ${y1} Z"><title>${tip}</title></path>`;
+  }
+  // only label the slice when there is room to read it
+  let label = "";
+  if (a >= 7){
+    const mid = a0 + a/2, [lx,ly] = wheelXY(mid, 74);
+    const size = a>=22 ? 9 : a>=12 ? 7.5 : 6;
+    label = `<text class="sl-t" x="${lx}" y="${ly}" font-size="${size}"
+      transform="rotate(${mid} ${lx} ${ly})">${p.num}</text>`;
+  }
+  return path + label;
+}
+
+function wheelHtml(pool){
+  const slices = pool.map((p,i)=>sliceHtml(i,pool.length,p)).join("");
+  const counts = {E:0,M:0,H:0,U:0};
+  for (const p of pool) counts[wheelDiff(p.num)]++;
+  const legend = [["E","Easy"],["M","Medium"],["H","Hard"],["U","Unrated"]]
+    .filter(([k])=>counts[k])
+    .map(([k,name])=>`<span class="wl"><span class="wd ${k}"></span>${name} ${counts[k]}</span>`)
+    .join("");
+  return `<div>
+    <div class="wheel-stage">
+      <div class="wheel-ptr" aria-hidden="true"></div>
+      <svg class="wheel" id="wheelSvg" viewBox="-104 -104 208 208" onclick="spin()">
+        <g id="wheelG">${slices}</g>
+      </svg>
+      <button class="wheel-hub" id="wheelHub" onclick="event.stopPropagation();spin()">SPIN</button>
+    </div>
+    <div class="wheel-legend">${legend}</div>
+  </div>`;
+}
+
+window.spin = ()=>{
+  if (spinning) return;
+  const pool = spinPool(); if (!pool.length) return;
+  // don't hand back the same problem twice in a row when there is a choice
+  let idx = Math.floor(Math.random()*pool.length);
+  if (pool.length>1 && pool[idx].num===spinPick) idx = (idx + 1 + Math.floor(Math.random()*(pool.length-1))) % pool.length;
+
+  const a = 360/pool.length;
+  const centre = (idx+0.5)*a;
+  const jitter = (Math.random()-0.5)*a*0.7;      // land off-centre, not dead-centre
+  const turns  = 4 + Math.floor(Math.random()*3);
+  // pointer sits at 12 o'clock, so the slice centre must end up at 0°
+  const want = ((-(centre+jitter)) % 360 + 360) % 360;
+  let R = spinRot - (spinRot % 360) + want;
+  while (R < spinRot + 360*turns) R += 360;
+
+  const svg = $("wheelSvg");
+  spinning = true;
+  spinPick = null;
+  $("spinResult").innerHTML = `<div class="spin-hint spin-live">Spinning…</div>`;
+  const hub = $("wheelHub"); if (hub) hub.disabled = true;
+  svg.style.transition = `transform ${SPIN_MS}ms cubic-bezier(.12,.72,.16,1)`;
+  requestAnimationFrame(()=>{ svg.style.transform = `rotate(${R}deg)`; });
+
+  clearTimeout(spinTimer);
+  spinTimer = setTimeout(()=>{
+    spinRot = R;
+    spinning = false;
+    spinPick = pool[idx].num;
+    renderRoulette();
+  }, SPIN_MS + 60);
+};
+
+window.spinDone = ()=>{
+  if (spinPick==null) return;
+  state.spins++;
+  bumpActivity();            // keeps the streak alive; the card is left untouched
+  spinPick = null;
+  save(); renderAll();
+};
+window.spinRusty = ()=>{
+  const p = state.problems.find(x=>x.num===spinPick); if(!p) return;
+  p.card.due = Date.now();   // moves it into the real queue — S/D/lapses unchanged
+  state.spins++;
+  bumpActivity();
+  spinPick = null;
+  save(); renderAll();
+};
+window.spinClear = ()=>{ spinPick=null; renderRoulette(); };
+
+function spinResultHtml(pool){
+  if (spinPick==null || !state.problems.some(p=>p.num===spinPick)){
+    return `<div class="spin-hint">Nothing due but still want to solve? Spin the wheel — ${pool.length} resting ${pool.length===1?"problem":"problems"} on it. Whatever it lands on stays exactly where it is in the schedule.</div>`;
+  }
+  const p = state.problems.find(x=>x.num===spinPick);
+  const d = diffOf(p.num), dTitle = d==="E"?"Easy":d==="M"?"Medium":d==="H"?"Hard":"";
+  // the statement modal is driven off RECS, so only offer it for roadmap problems
+  const hasStmt = PROBLEM_HTML[p.num] != null &&
+    RECS.some(([,items])=>items.some(it=>it[0]===p.num));
+  return `<div class="qcard spin-hit">
+    <div class="qtop">
+      <div class="qtitle">
+        ${d?`<span class="diff ${d}" style="margin-right:6px">${dTitle}</span>`:""}
+        <a href="${p.url}" target="_blank" rel="noopener">${p.num}. ${p.title}</a>
+      </div>
+      <div class="qmeta">est. recall ${Math.round(recallNow(p)*100)}% · next review ${fmtDate(p.card.due)}</div>
+    </div>
+    <div class="spin-row">
+      <button class="primary" onclick="spinDone()">Solved it 👍</button>
+      <button class="g2" onclick="spinRusty()">Rusty — review it now</button>
+      ${hasStmt?`<button onclick="openRecNote(${p.num})">Read statement</button>`:""}
+      <button class="del" style="margin-left:auto" onclick="spinClear()" title="Put it back">✕</button>
+    </div>
+  </div>`;
+}
+
+function renderRoulette(){
+  if (spinning) return;   // never swap the DOM out from under a running spin
+  const box=$("roulette");
+  $("spinCount").textContent = state.spins ? state.spins+" spun" : "no stakes";
+  const pool = spinPool();
+  if (!pool.length){
+    spinPick=null;
+    box.innerHTML = `<div class="empty">Nothing to spin — everything you track is already due for review.</div>`;
+    return;
+  }
+  box.innerHTML = `<div class="wheel-wrap">
+    ${wheelHtml(pool)}
+    <div class="wheel-side" id="spinResult">${spinResultHtml(pool)}</div>
+  </div>`;
+  // restore the resting angle without replaying the animation
+  const svg=$("wheelSvg");
+  svg.style.transition="none";
+  svg.style.transform=`rotate(${spinRot}deg)`;
+}
+
+let openReview = null; // problem num with inline grade row open
+// difficulties for problems outside the NeetCode 150 list — add entries here as you track new ones
+const DIFF_EXTRA = {
+  633: "M", // Sum of Square Numbers
+};
+// num -> E/M/H, built lazily from RECS (declared further down, so don't touch it at load time)
+let DIFF_BY_NUM = null;
+function diffOf(num){
+  if (!DIFF_BY_NUM){
+    DIFF_BY_NUM = new Map();
+    for (const [,items] of RECS) for (const it of items) DIFF_BY_NUM.set(it[0], it[2]);
+    for (const k in DIFF_EXTRA) DIFF_BY_NUM.set(+k, DIFF_EXTRA[k]);
+  }
+  return DIFF_BY_NUM.get(num) || "";
+}
+function renderTable(){
+  $("allCount").textContent = state.problems.length+" tracked";
+  const now=Date.now();
+  const rows=[...state.problems].sort((a,b)=>a.card.due-b.card.due).map(p=>{
+    const r=recallNow(p), di=dueInfo(p), d=diffOf(p.num);
+    const dTitle=d==="E"?"Easy":d==="M"?"Medium":d==="H"?"Hard":"";
+    let row=`<tr onclick="showCurve(${p.num})">
+      <td><span class="num ${d}"${dTitle?` title="${dTitle}"`:""}>${p.num}</span></td>
+      <td><a href="${p.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.title}</a></td>
+      <td><span class="rbar"><i style="width:${Math.round(r*100)}%"></i></span>${Math.round(r*100)}%</td>
+      <td>${p.card.S.toFixed(1)}d</td>
+      <td class="${di.cls}">${di.txt}</td>
+      <td>${p.card.reps}</td><td>${p.card.lapses}</td>
+      <td style="white-space:nowrap">
+        <button class="rev${openReview===p.num?" primary":""}" onclick="event.stopPropagation();toggleReview(${p.num})">Review</button>
+        <button class="del" onclick="event.stopPropagation();removeProblem(${p.num})" title="Remove">✕</button>
+      </td>
+    </tr>`;
+    if (openReview===p.num){
+      const btns=[1,2,3,4].map(g=>{
+        const prev=schedule(p.card,g,now);
+        return `<button class="g${g}" onclick="rate(${p.num},${g})">${GNAME[g]}<small>${prev.ivl}d</small></button>`;
+      }).join("");
+      row+=`<tr><td colspan="8" style="background:var(--surface2)">
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:6px">Solving again now — how did it go? (reschedules next review)</div>
+        <div class="grades" style="margin-top:0">${btns}</div>
+      </td></tr>`;
+    }
+    return row;
+  }).join("");
+  $("tbody").innerHTML = rows || `<tr><td colspan="8" class="empty">No problems yet — add one below.</td></tr>`;
+}
+window.toggleReview = num=>{ openReview = openReview===num ? null : num; renderTable(); };
+
+/* ---- forgetting curve SVG ---- */
+function showCurve(num){
+  const p = state.problems.find(x=>x.num===num); if(!p) return;
+  const Wd=920,H=200,L=40,R2=10,T=12,B=26, pw=Wd-L-R2, ph=H-T-B;
+  const elapsed=Math.max(0,(Date.now()-p.card.last)/864e5);
+  const span=Math.max(elapsed+14, nextInterval(p.card.S)*1.6, 10);
+  const X=d=>L+d/span*pw, Y=r=>T+(1-r)*ph;
+  let path="";
+  for(let i=0;i<=120;i++){ const d=span*i/120, r=retrievability(d,p.card.S);
+    path+=(i?"L":"M")+X(d).toFixed(1)+" "+Y(r).toFixed(1)+" "; }
+  const dueD=(p.card.due-p.card.last)/864e5;
+  const grid=[1,.9,.75,.5,.25].map(r=>
+    `<line x1="${L}" x2="${Wd-R2}" y1="${Y(r)}" y2="${Y(r)}" stroke="var(--row-border)"/>
+     <text x="${L-6}" y="${Y(r)+4}" text-anchor="end">${Math.round(r*100)}%</text>`).join("");
+  const ticks=[];
+  const step=span>60?30:span>21?7:span>10?5:1;
+  for(let d=0;d<=span;d+=step) ticks.push(`<text x="${X(d)}" y="${H-8}" text-anchor="middle">${Math.round(d)}d</text>`);
+  $("curveSvg").innerHTML = grid + ticks.join("") +
+    `<line x1="${X(dueD)}" x2="${X(dueD)}" y1="${T}" y2="${T+ph}" stroke="var(--amber)" stroke-dasharray="4 3"/>
+     <text x="${X(dueD)+5}" y="${T+12}" fill="var(--amber)">review due (${Math.round(TARGET_R*100)}%)</text>
+     <path d="${path}" fill="none" stroke="var(--green-soft)" stroke-width="2"/>
+     <circle cx="${X(elapsed)}" cy="${Y(retrievability(elapsed,p.card.S))}" r="4.5" fill="var(--green)" stroke="var(--bg)" stroke-width="2"/>
+     <text x="${Math.min(X(elapsed)+8,Wd-70)}" y="${Y(retrievability(elapsed,p.card.S))-8}" fill="var(--ink)">now ${Math.round(recallNow(p)*100)}%</text>`;
+  $("curveTitle").textContent = `Forgetting curve — ${p.num}. ${p.title}`;
+  $("curveStats").innerHTML =
+    `<span>Stability <b>${p.card.S.toFixed(1)} days</b></span>
+     <span>Difficulty <b>${p.card.D.toFixed(1)}/10</b></span>
+     <span>Last review <b>${fmtDate(p.card.last)}</b></span>
+     <span>Next review <b>${fmtDate(p.card.due)}</b></span>
+     <span>Reviews <b>${p.card.reps}</b></span>`;
+  $("curvePanel").classList.add("open");
+  $("curvePanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+$("curveClose").onclick=()=>$("curvePanel").classList.remove("open");
+
+/* ===================== actions ===================== */
+function bumpActivity(){ const k=dkey(new Date()); state.activity[k]=(state.activity[k]||0)+1; }
+
+window.rate = (num,g)=>{
+  const p=state.problems.find(x=>x.num===num); if(!p) return;
+  p.card = schedule(p.card,g,Date.now());
+  p.history.push({t:Date.now(),g});
+  openReview=null;
+  bumpActivity(); save(); renderAll();
+};
+window.removeProblem = num=>{
+  const p=state.problems.find(x=>x.num===num);
+  if (p && confirm(`Remove ${p.num}. ${p.title}? Review history is lost.`)){
+    state.problems=state.problems.filter(x=>x.num!==num); save(); renderAll();
+  }
+};
+window.showCurve = showCurve;
+
+$("addBtn").onclick=()=>{
+  const num=parseInt($("addNum").value,10), title=$("addTitle").value.trim();
+  if(!num||!title) return alert("Need both problem number and title.");
+  if(state.problems.some(p=>p.num===num)) return alert("Problem "+num+" already tracked.");
+  const now=Date.now();
+  state.problems.push({num,title,url:"https://leetcode.com/problems/"+slug(title)+"/",added:now,card:newCard(3,now),history:[{t:now,g:3}]});
+  bumpActivity(); save();
+  $("addNum").value=""; $("addTitle").value="";
+  renderAll();
+};
+$("addTitle").addEventListener("keydown",e=>{ if(e.key==="Enter") $("addBtn").click(); });
+
+$("themeBtn").onclick = toggleTheme;
+applyTheme(currentTheme());   // paint the button label now that it exists
+
+$("exportBtn").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));
+  a.download="leetcode-fsrs-backup-"+dkey(new Date())+".json"; a.click();
+};
+$("importBtn").onclick=()=>$("importFile").click();
+$("syncBtn").onclick=()=>{
+  const c=ghCfg()||{repo:GH.REPO};
+  const token=prompt("GitHub fine-grained token (Contents: read/write on "+c.repo+"). Empty = disable sync.", c.token||"");
+  if(token===null) return;
+  if(!token){ localStorage.removeItem(GH.KEY); ghStatus("Sync"); return; }
+  localStorage.setItem(GH.KEY, JSON.stringify({repo:c.repo, token}));
+  GH.sha=null; ghPull();
+};
+$("importFile").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  f.text().then(t=>{
+    try{ const d=JSON.parse(t);
+      if(!Array.isArray(d.problems)||typeof d.activity!=="object") throw 0;
+      if(!d.notes) d.notes={};
+      if(!d.badges) d.badges={};
+      if(typeof d.spins!=="number") d.spins=0;
+      state=d; save(); renderAll();
+    }catch(_){ alert("Not a valid backup file."); }
+    e.target.value="";
+  });
+};
+
+/* fetched from LeetCode GraphQL API — official problem statements (sanitized HTML), for local reading only */
+const PROBLEM_HTML = {
+  1: "<p>Given an array of integers <code>nums</code>&nbsp;and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.</p>\n\n<p>You may assume that each input would have <strong><em>exactly</em> one solution</strong>, and you may not use the <em>same</em> element twice.</p>\n\n<p>You can return the answer in any order.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [2,7,11,15], target = 9\n<strong>Output:</strong> [0,1]\n<strong>Explanation:</strong> Because nums[0] + nums[1] == 9, we return [0, 1].\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [3,2,4], target = 6\n<strong>Output:</strong> [1,2]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [3,3], target = 6\n<strong>Output:</strong> [0,1]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>\n\t<li><code>-10<sup>9</sup> &lt;= target &lt;= 10<sup>9</sup></code></li>\n\t<li><strong>Only one valid answer exists.</strong></li>\n</ul>\n\n<p>&nbsp;</p>\n<strong>Follow-up:&nbsp;</strong>Can you come up with an algorithm that is less than <code>O(n<sup>2</sup>)</code><font face=\"monospace\">&nbsp;</font>time complexity?",
+  3: "<p>Given a string <code>s</code>, find the length of the <strong>longest</strong> <span data-keyword=\"substring-nonempty\"><strong>substring</strong></span> without duplicate characters.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;abcabcbb&quot;\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> The answer is &quot;abc&quot;, with the length of 3. Note that <code>&quot;bca&quot;</code> and <code>&quot;cab&quot;</code> are also correct answers.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;bbbbb&quot;\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> The answer is &quot;b&quot;, with the length of 1.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;pwwkew&quot;\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> The answer is &quot;wke&quot;, with the length of 3.\nNotice that the answer must be a substring, &quot;pwke&quot; is a subsequence and not a substring.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>0 &lt;= s.length &lt;= 5 * 10<sup>4</sup></code></li>\n\t<li><code>s</code> consists of English letters, digits, symbols and spaces.</li>\n</ul>\n",
+  15: "<p>Given an integer array nums, return all the triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j</code>, <code>i != k</code>, and <code>j != k</code>, and <code>nums[i] + nums[j] + nums[k] == 0</code>.</p>\n\n<p>Notice that the solution set must not contain duplicate triplets.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [-1,0,1,2,-1,-4]\n<strong>Output:</strong> [[-1,-1,2],[-1,0,1]]\n<strong>Explanation:</strong> \nnums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.\nnums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.\nnums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.\nThe distinct triplets are [-1,0,1] and [-1,-1,2].\nNotice that the order of the output and the order of the triplets does not matter.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0,1,1]\n<strong>Output:</strong> []\n<strong>Explanation:</strong> The only possible triplet does not sum up to 0.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0,0,0]\n<strong>Output:</strong> [[0,0,0]]\n<strong>Explanation:</strong> The only possible triplet sums up to 0.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>3 &lt;= nums.length &lt;= 3000</code></li>\n\t<li><code>-10<sup>5</sup> &lt;= nums[i] &lt;= 10<sup>5</sup></code></li>\n</ul>\n",
+  20: "<p>Given a string <code>s</code> containing just the characters <code>&#39;(&#39;</code>, <code>&#39;)&#39;</code>, <code>&#39;{&#39;</code>, <code>&#39;}&#39;</code>, <code>&#39;[&#39;</code> and <code>&#39;]&#39;</code>, determine if the input string is valid.</p>\n\n<p>An input string is valid if:</p>\n\n<ol>\n\t<li>Open brackets must be closed by the same type of brackets.</li>\n\t<li>Open brackets must be closed in the correct order.</li>\n\t<li>Every close bracket has a corresponding open bracket of the same type.</li>\n</ol>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;()&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;()[]{}&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;(]&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">false</span></p>\n</div>\n\n<p><strong class=\"example\">Example 4:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;([])&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n</div>\n\n<p><strong class=\"example\">Example 5:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;([)]&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">false</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>s</code> consists of parentheses only <code>&#39;()[]{}&#39;</code>.</li>\n</ul>\n",
+  21: "<p>You are given the heads of two sorted linked lists <code>list1</code> and <code>list2</code>.</p>\n\n<p>Merge the two lists into one <strong>sorted</strong> list. The list should be made by splicing together the nodes of the first two lists.</p>\n\n<p>Return <em>the head of the merged linked list</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/10/03/merge_ex1.jpg\" style=\"width: 662px; height: 302px;\" />\n<pre>\n<strong>Input:</strong> list1 = [1,2,4], list2 = [1,3,4]\n<strong>Output:</strong> [1,1,2,3,4,4]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> list1 = [], list2 = []\n<strong>Output:</strong> []\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> list1 = [], list2 = [0]\n<strong>Output:</strong> [0]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in both lists is in the range <code>[0, 50]</code>.</li>\n\t<li><code>-100 &lt;= Node.val &lt;= 100</code></li>\n\t<li>Both <code>list1</code> and <code>list2</code> are sorted in <strong>non-decreasing</strong> order.</li>\n</ul>\n",
+  39: "<p>Given an array of <strong>distinct</strong> integers <code>candidates</code> and a target integer <code>target</code>, return <em>a list of all <strong>unique combinations</strong> of </em><code>candidates</code><em> where the chosen numbers sum to </em><code>target</code><em>.</em> You may return the combinations in <strong>any order</strong>.</p>\n\n<p>The <strong>same</strong> number may be chosen from <code>candidates</code> an <strong>unlimited number of times</strong>. Two combinations are unique if the <span data-keyword=\"frequency-array\">frequency</span> of at least one of the chosen numbers is different.</p>\n\n<p>The test cases are generated such that the number of unique combinations that sum up to <code>target</code> is less than <code>150</code> combinations for the given input.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> candidates = [2,3,6,7], target = 7\n<strong>Output:</strong> [[2,2,3],[7]]\n<strong>Explanation:</strong>\n2 and 3 are candidates, and 2 + 2 + 3 = 7. Note that 2 can be used multiple times.\n7 is a candidate, and 7 = 7.\nThese are the only two combinations.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> candidates = [2,3,5], target = 8\n<strong>Output:</strong> [[2,2,2,2],[2,3,3],[3,5]]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> candidates = [2], target = 1\n<strong>Output:</strong> []\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= candidates.length &lt;= 30</code></li>\n\t<li><code>2 &lt;= candidates[i] &lt;= 40</code></li>\n\t<li>All elements of <code>candidates</code> are <strong>distinct</strong>.</li>\n\t<li><code>1 &lt;= target &lt;= 40</code></li>\n</ul>\n",
+  49: "<p>Given an array of strings <code>strs</code>, group the <span data-keyword=\"anagram\">anagrams</span> together. You can return the answer in <strong>any order</strong>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">strs = [&quot;eat&quot;,&quot;tea&quot;,&quot;tan&quot;,&quot;ate&quot;,&quot;nat&quot;,&quot;bat&quot;]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[[&quot;bat&quot;],[&quot;nat&quot;,&quot;tan&quot;],[&quot;ate&quot;,&quot;eat&quot;,&quot;tea&quot;]]</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<ul>\n\t<li>There is no string in strs that can be rearranged to form <code>&quot;bat&quot;</code>.</li>\n\t<li>The strings <code>&quot;nat&quot;</code> and <code>&quot;tan&quot;</code> are anagrams as they can be rearranged to form each other.</li>\n\t<li>The strings <code>&quot;ate&quot;</code>, <code>&quot;eat&quot;</code>, and <code>&quot;tea&quot;</code> are anagrams as they can be rearranged to form each other.</li>\n</ul>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">strs = [&quot;&quot;]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[[&quot;&quot;]]</span></p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">strs = [&quot;a&quot;]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[[&quot;a&quot;]]</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= strs.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>0 &lt;= strs[i].length &lt;= 100</code></li>\n\t<li><code>strs[i]</code> consists of lowercase English letters.</li>\n</ul>\n",
+  53: "<p>Given an integer array <code>nums</code>, find the <span data-keyword=\"subarray-nonempty\">subarray</span> with the largest sum, and return <em>its sum</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [-2,1,-3,4,-1,2,1,-5,4]\n<strong>Output:</strong> 6\n<strong>Explanation:</strong> The subarray [4,-1,2,1] has the largest sum 6.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1]\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> The subarray [1] has the largest sum 1.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [5,4,-1,7,8]\n<strong>Output:</strong> 23\n<strong>Explanation:</strong> The subarray [5,4,-1,7,8] has the largest sum 23.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> If you have figured out the <code>O(n)</code> solution, try coding another solution using the <strong>divide and conquer</strong> approach, which is more subtle.</p>\n",
+  56: "<p>Given an array&nbsp;of <code>intervals</code>&nbsp;where <code>intervals[i] = [start<sub>i</sub>, end<sub>i</sub>]</code>, merge all overlapping intervals, and return <em>an array of the non-overlapping intervals that cover all the intervals in the input</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> intervals = [[1,3],[2,6],[8,10],[15,18]]\n<strong>Output:</strong> [[1,6],[8,10],[15,18]]\n<strong>Explanation:</strong> Since intervals [1,3] and [2,6] overlap, merge them into [1,6].\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> intervals = [[1,4],[4,5]]\n<strong>Output:</strong> [[1,5]]\n<strong>Explanation:</strong> Intervals [1,4] and [4,5] are considered overlapping.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> intervals = [[4,7],[1,4]]\n<strong>Output:</strong> [[1,7]]\n<strong>Explanation:</strong> Intervals [1,4] and [4,7] are considered overlapping.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= intervals.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>intervals[i].length == 2</code></li>\n\t<li><code>0 &lt;= start<sub>i</sub> &lt;= end<sub>i</sub> &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+  70: "<p>You are climbing a staircase. It takes <code>n</code> steps to reach the top.</p>\n\n<p>Each time you can either climb <code>1</code> or <code>2</code> steps. In how many distinct ways can you climb to the top?</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> n = 2\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> n = 3\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> There are three ways to climb to the top.\n1. 1 step + 1 step + 1 step\n2. 1 step + 2 steps\n3. 2 steps + 1 step\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= n &lt;= 45</code></li>\n</ul>\n",
+  74: "<p>You are given an <code>m x n</code> integer matrix <code>matrix</code> with the following two properties:</p>\n\n<ul>\n\t<li>Each row is sorted in non-decreasing order.</li>\n\t<li>The first integer of each row is greater than the last integer of the previous row.</li>\n</ul>\n\n<p>Given an integer <code>target</code>, return <code>true</code> <em>if</em> <code>target</code> <em>is in</em> <code>matrix</code> <em>or</em> <code>false</code> <em>otherwise</em>.</p>\n\n<p>You must write a solution in <code>O(log(m * n))</code> time complexity.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/10/05/mat.jpg\" style=\"width: 322px; height: 242px;\" />\n<pre>\n<strong>Input:</strong> matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3\n<strong>Output:</strong> true\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/10/05/mat2.jpg\" style=\"width: 322px; height: 242px;\" />\n<pre>\n<strong>Input:</strong> matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13\n<strong>Output:</strong> false\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>m == matrix.length</code></li>\n\t<li><code>n == matrix[i].length</code></li>\n\t<li><code>1 &lt;= m, n &lt;= 100</code></li>\n\t<li><code>-10<sup>4</sup> &lt;= matrix[i][j], target &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+  78: "<p>Given an integer array <code>nums</code> of <strong>unique</strong> elements, return <em>all possible</em> <span data-keyword=\"subset\"><em>subsets</em></span> <em>(the power set)</em>.</p>\n\n<p>The solution set <strong>must not</strong> contain duplicate subsets. Return the solution in <strong>any order</strong>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,2,3]\n<strong>Output:</strong> [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0]\n<strong>Output:</strong> [[],[0]]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10</code></li>\n\t<li><code>-10 &lt;= nums[i] &lt;= 10</code></li>\n\t<li>All the numbers of&nbsp;<code>nums</code> are <strong>unique</strong>.</li>\n</ul>\n",
+  100: "<p>Given the roots of two binary trees <code>p</code> and <code>q</code>, write a function to check if they are the same or not.</p>\n\n<p>Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex1.jpg\" style=\"width: 622px; height: 182px;\" />\n<pre>\n<strong>Input:</strong> p = [1,2,3], q = [1,2,3]\n<strong>Output:</strong> true\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex2.jpg\" style=\"width: 382px; height: 182px;\" />\n<pre>\n<strong>Input:</strong> p = [1,2], q = [1,null,2]\n<strong>Output:</strong> false\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex3.jpg\" style=\"width: 622px; height: 182px;\" />\n<pre>\n<strong>Input:</strong> p = [1,2,1], q = [1,1,2]\n<strong>Output:</strong> false\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in both trees is in the range <code>[0, 100]</code>.</li>\n\t<li><code>-10<sup>4</sup> &lt;= Node.val &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+  102: "<p>Given the <code>root</code> of a binary tree, return <em>the level order traversal of its nodes&#39; values</em>. (i.e., from left to right, level by level).</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/19/tree1.jpg\" style=\"width: 277px; height: 302px;\" />\n<pre>\n<strong>Input:</strong> root = [3,9,20,null,null,15,7]\n<strong>Output:</strong> [[3],[9,20],[15,7]]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> root = [1]\n<strong>Output:</strong> [[1]]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> root = []\n<strong>Output:</strong> []\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the tree is in the range <code>[0, 2000]</code>.</li>\n\t<li><code>-1000 &lt;= Node.val &lt;= 1000</code></li>\n</ul>\n",
+  104: "<p>Given the <code>root</code> of a binary tree, return <em>its maximum depth</em>.</p>\n\n<p>A binary tree&#39;s <strong>maximum depth</strong>&nbsp;is the number of nodes along the longest path from the root node down to the farthest leaf node.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/11/26/tmp-tree.jpg\" style=\"width: 400px; height: 277px;\" />\n<pre>\n<strong>Input:</strong> root = [3,9,20,null,null,15,7]\n<strong>Output:</strong> 3\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> root = [1,null,2]\n<strong>Output:</strong> 2\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the tree is in the range <code>[0, 10<sup>4</sup>]</code>.</li>\n\t<li><code>-100 &lt;= Node.val &lt;= 100</code></li>\n</ul>\n",
+  121: "<p>You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i<sup>th</sup></code> day.</p>\n\n<p>You want to maximize your profit by choosing a <strong>single day</strong> to buy one stock and choosing a <strong>different day in the future</strong> to sell that stock.</p>\n\n<p>Return <em>the maximum profit you can achieve from this transaction</em>. If you cannot achieve any profit, return <code>0</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> prices = [7,1,5,3,6,4]\n<strong>Output:</strong> 5\n<strong>Explanation:</strong> Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.\nNote that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> prices = [7,6,4,3,1]\n<strong>Output:</strong> 0\n<strong>Explanation:</strong> In this case, no transactions are done and the max profit = 0.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= prices.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>0 &lt;= prices[i] &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+  125: "<p>A phrase is a <strong>palindrome</strong> if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.</p>\n\n<p>Given a string <code>s</code>, return <code>true</code><em> if it is a <strong>palindrome</strong>, or </em><code>false</code><em> otherwise</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;A man, a plan, a canal: Panama&quot;\n<strong>Output:</strong> true\n<strong>Explanation:</strong> &quot;amanaplanacanalpanama&quot; is a palindrome.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;race a car&quot;\n<strong>Output:</strong> false\n<strong>Explanation:</strong> &quot;raceacar&quot; is not a palindrome.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot; &quot;\n<strong>Output:</strong> true\n<strong>Explanation:</strong> s is an empty string &quot;&quot; after removing non-alphanumeric characters.\nSince an empty string reads the same forward and backward, it is a palindrome.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 2 * 10<sup>5</sup></code></li>\n\t<li><code>s</code> consists only of printable ASCII characters.</li>\n</ul>\n",
+  136: "<p>Given a <strong>non-empty</strong>&nbsp;array of integers <code>nums</code>, every element appears <em>twice</em> except for one. Find that single one.</p>\n\n<p>You must&nbsp;implement a solution with a linear runtime complexity and use&nbsp;only constant&nbsp;extra space.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [2,2,1]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">1</span></p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [4,1,2,1,2]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">4</span></p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">1</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 3 * 10<sup>4</sup></code></li>\n\t<li><code>-3 * 10<sup>4</sup> &lt;= nums[i] &lt;= 3 * 10<sup>4</sup></code></li>\n\t<li>Each element in the array appears twice except for one element which appears only once.</li>\n</ul>\n",
+  141: "<p>Given <code>head</code>, the head of a linked list, determine if the linked list has a cycle in it.</p>\n\n<p>There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the&nbsp;<code>next</code>&nbsp;pointer. Internally, <code>pos</code>&nbsp;is used to denote the index of the node that&nbsp;tail&#39;s&nbsp;<code>next</code>&nbsp;pointer is connected to.&nbsp;<strong>Note that&nbsp;<code>pos</code>&nbsp;is not passed as a parameter</strong>.</p>\n\n<p>Return&nbsp;<code>true</code><em> if there is a cycle in the linked list</em>. Otherwise, return <code>false</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist.png\" style=\"width: 300px; height: 97px; margin-top: 8px; margin-bottom: 8px;\" />\n<pre>\n<strong>Input:</strong> head = [3,2,0,-4], pos = 1\n<strong>Output:</strong> true\n<strong>Explanation:</strong> There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test2.png\" style=\"width: 141px; height: 74px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2], pos = 0\n<strong>Output:</strong> true\n<strong>Explanation:</strong> There is a cycle in the linked list, where the tail connects to the 0th node.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test3.png\" style=\"width: 45px; height: 45px;\" />\n<pre>\n<strong>Input:</strong> head = [1], pos = -1\n<strong>Output:</strong> false\n<strong>Explanation:</strong> There is no cycle in the linked list.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of the nodes in the list is in the range <code>[0, 10<sup>4</sup>]</code>.</li>\n\t<li><code>-10<sup>5</sup> &lt;= Node.val &lt;= 10<sup>5</sup></code></li>\n\t<li><code>pos</code> is <code>-1</code> or a <strong>valid index</strong> in the linked-list.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> Can you solve it using <code>O(1)</code> (i.e. constant) memory?</p>\n",
+  155: "<p>Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.</p>\n\n<p>Implement the <code>MinStack</code> class:</p>\n\n<ul>\n\t<li><code>MinStack()</code> initializes the stack object.</li>\n\t<li><code>void push(int value)</code> pushes the element <code>value</code> onto the stack.</li>\n\t<li><code>void pop()</code> removes the element on the top of the stack.</li>\n\t<li><code>int top()</code> gets the top element of the stack.</li>\n\t<li><code>int getMin()</code> retrieves the minimum element in the stack.</li>\n</ul>\n\n<p>You must implement a solution with <code>O(1)</code> time complexity for each function.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input</strong>\n[&quot;MinStack&quot;,&quot;push&quot;,&quot;push&quot;,&quot;push&quot;,&quot;getMin&quot;,&quot;pop&quot;,&quot;top&quot;,&quot;getMin&quot;]\n[[],[-2],[0],[-3],[],[],[],[]]\n\n<strong>Output</strong>\n[null,null,null,null,-3,null,0,-2]\n\n<strong>Explanation</strong>\nMinStack minStack = new MinStack();\nminStack.push(-2);\nminStack.push(0);\nminStack.push(-3);\nminStack.getMin(); // return -3\nminStack.pop();\nminStack.top();    // return 0\nminStack.getMin(); // return -2\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>-2<sup>31</sup> &lt;= val &lt;= 2<sup>31</sup> - 1</code></li>\n\t<li>Methods <code>pop</code>, <code>top</code> and <code>getMin</code> operations will always be called on <strong>non-empty</strong> stacks.</li>\n\t<li>At most <code>3 * 10<sup>4</sup></code> calls will be made to <code>push</code>, <code>pop</code>, <code>top</code>, and <code>getMin</code>.</li>\n</ul>\n",
+  167: "<p>Given a <strong>1-indexed</strong> array of integers <code>numbers</code> that is already <strong><em>sorted in non-decreasing order</em></strong>, find two numbers such that they add up to a specific <code>target</code> number. Let these two numbers be <code>numbers[index<sub>1</sub>]</code> and <code>numbers[index<sub>2</sub>]</code> where <code>1 &lt;= index<sub>1</sub> &lt; index<sub>2</sub> &lt;= numbers.length</code>.</p>\n\n<p>Return<em> the indices of the two numbers&nbsp;</em><code>index<sub>1</sub></code><em> and </em><code>index<sub>2</sub></code><em>, <strong>each incremented by one,</strong> as an integer array </em><code>[index<sub>1</sub>, index<sub>2</sub>]</code><em> of length 2.</em></p>\n\n<p>The tests are generated such that there is <strong>exactly one solution</strong>. You <strong>may not</strong> use the same element twice.</p>\n\n<p>Your solution must use only constant extra space.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>2</u>,<u>7</u>,11,15], target = 9\n<strong>Output:</strong> [1,2]\n<strong>Explanation:</strong> The sum of 2 and 7 is 9. Therefore, index<sub>1</sub> = 1, index<sub>2</sub> = 2. We return [1, 2].\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>2</u>,3,<u>4</u>], target = 6\n<strong>Output:</strong> [1,3]\n<strong>Explanation:</strong> The sum of 2 and 4 is 6. Therefore index<sub>1</sub> = 1, index<sub>2</sub> = 3. We return [1, 3].\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>-1</u>,<u>0</u>], target = -1\n<strong>Output:</strong> [1,2]\n<strong>Explanation:</strong> The sum of -1 and 0 is -1. Therefore index<sub>1</sub> = 1, index<sub>2</sub> = 2. We return [1, 2].\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= numbers.length &lt;= 3 * 10<sup>4</sup></code></li>\n\t<li><code>-1000 &lt;= numbers[i] &lt;= 1000</code></li>\n\t<li><code>numbers</code> is sorted in <strong>non-decreasing order</strong>.</li>\n\t<li><code>-1000 &lt;= target &lt;= 1000</code></li>\n\t<li>The tests are generated such that there is <strong>exactly one solution</strong>.</li>\n</ul>\n",
+  191: "<p>Given a positive integer <code>n</code>, write a function that returns the number of <span data-keyword=\"set-bit\">set bits</span> in its binary representation (also known as the <a href=\"http://en.wikipedia.org/wiki/Hamming_weight\" target=\"_blank\">Hamming weight</a>).</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">n = 11</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">3</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>The input binary string <strong>1011</strong> has a total of three set bits.</p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">n = 128</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">1</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>The input binary string <strong>10000000</strong> has a total of one set bit.</p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">n = 2147483645</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">30</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>The input binary string <strong>1111111111111111111111111111101</strong> has a total of thirty set bits.</p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= n &lt;= 2<sup>31</sup> - 1</code></li>\n</ul>\n\n<p>&nbsp;</p>\n<strong>Follow up:</strong> If this function is called many times, how would you optimize it?",
+  198: "<p>You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and <b>it will automatically contact the police if two adjacent houses were broken into on the same night</b>.</p>\n\n<p>Given an integer array <code>nums</code> representing the amount of money of each house, return <em>the maximum amount of money you can rob tonight <b>without alerting the police</b></em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,2,3,1]\n<strong>Output:</strong> 4\n<strong>Explanation:</strong> Rob house 1 (money = 1) and then rob house 3 (money = 3).\nTotal amount you can rob = 1 + 3 = 4.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [2,7,9,3,1]\n<strong>Output:</strong> 12\n<strong>Explanation:</strong> Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).\nTotal amount you can rob = 2 + 9 + 1 = 12.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 100</code></li>\n\t<li><code>0 &lt;= nums[i] &lt;= 400</code></li>\n</ul>\n",
+  200: "<p>Given an <code>m x n</code> 2D binary grid <code>grid</code> which represents a map of <code>&#39;1&#39;</code>s (land) and <code>&#39;0&#39;</code>s (water), return <em>the number of islands</em>.</p>\n\n<p>An <strong>island</strong> is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> grid = [\n  [&quot;1&quot;,&quot;1&quot;,&quot;1&quot;,&quot;1&quot;,&quot;0&quot;],\n  [&quot;1&quot;,&quot;1&quot;,&quot;0&quot;,&quot;1&quot;,&quot;0&quot;],\n  [&quot;1&quot;,&quot;1&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;],\n  [&quot;0&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;]\n]\n<strong>Output:</strong> 1\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> grid = [\n  [&quot;1&quot;,&quot;1&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;],\n  [&quot;1&quot;,&quot;1&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;],\n  [&quot;0&quot;,&quot;0&quot;,&quot;1&quot;,&quot;0&quot;,&quot;0&quot;],\n  [&quot;0&quot;,&quot;0&quot;,&quot;0&quot;,&quot;1&quot;,&quot;1&quot;]\n]\n<strong>Output:</strong> 3\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>m == grid.length</code></li>\n\t<li><code>n == grid[i].length</code></li>\n\t<li><code>1 &lt;= m, n &lt;= 300</code></li>\n\t<li><code>grid[i][j]</code> is <code>&#39;0&#39;</code> or <code>&#39;1&#39;</code>.</li>\n</ul>\n",
+  206: "<p>Given the <code>head</code> of a singly linked list, reverse the list, and return <em>the reversed list</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/19/rev1ex1.jpg\" style=\"width: 542px; height: 222px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2,3,4,5]\n<strong>Output:</strong> [5,4,3,2,1]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/19/rev1ex2.jpg\" style=\"width: 182px; height: 222px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2]\n<strong>Output:</strong> [2,1]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> head = []\n<strong>Output:</strong> []\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the list is the range <code>[0, 5000]</code>.</li>\n\t<li><code>-5000 &lt;= Node.val &lt;= 5000</code></li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> A linked list can be reversed either iteratively or recursively. Could you implement both?</p>\n",
+  217: "<p>Given an integer array <code>nums</code>, return <code>true</code> if any value appears <strong>at least twice</strong> in the array, and return <code>false</code> if every element is distinct.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1,2,3,1]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>The element 1 occurs at the indices 0 and 3.</p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1,2,3,4]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">false</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>All elements are distinct.</p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1,1,1,3,3,4,3,2,4,2]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>\n</ul>\n",
+  226: "<p>Given the <code>root</code> of a binary tree, invert the tree, and return <em>its root</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/14/invert1-tree.jpg\" style=\"width: 500px; height: 165px;\" />\n<pre>\n<strong>Input:</strong> root = [4,2,7,1,3,6,9]\n<strong>Output:</strong> [4,7,2,9,6,3,1]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/14/invert2-tree.jpg\" style=\"width: 500px; height: 120px;\" />\n<pre>\n<strong>Input:</strong> root = [2,1,3]\n<strong>Output:</strong> [2,3,1]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> root = []\n<strong>Output:</strong> []\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the tree is in the range <code>[0, 100]</code>.</li>\n\t<li><code>-100 &lt;= Node.val &lt;= 100</code></li>\n</ul>\n",
+  238: "<p>Given an integer array <code>nums</code>, return <em>an array</em> <code>answer</code> <em>such that</em> <code>answer[i]</code> <em>is equal to the product of all the elements of</em> <code>nums</code> <em>except</em> <code>nums[i]</code>.</p>\n\n<p>The product of any prefix or suffix of <code>nums</code> is <strong>guaranteed</strong> to fit in a <strong>32-bit</strong> integer.</p>\n\n<p>You must write an algorithm that runs in&nbsp;<code>O(n)</code>&nbsp;time and without using the division operation.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<pre><strong>Input:</strong> nums = [1,2,3,4]\n<strong>Output:</strong> [24,12,8,6]\n</pre><p><strong class=\"example\">Example 2:</strong></p>\n<pre><strong>Input:</strong> nums = [-1,1,0,-3,3]\n<strong>Output:</strong> [0,0,9,0,0]\n</pre>\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-30 &lt;= nums[i] &lt;= 30</code></li>\n\t<li>The input is generated such that <code>answer[i]</code> is <strong>guaranteed</strong> to fit in a <strong>32-bit</strong> integer.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong>&nbsp;Can you solve the problem in <code>O(1)</code>&nbsp;extra&nbsp;space complexity? (The output array <strong>does not</strong> count as extra space for space complexity analysis.)</p>\n",
+  242: "<p>Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if <code>t</code> is an <span data-keyword=\"anagram\">anagram</span> of <code>s</code>, and <code>false</code> otherwise.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;anagram&quot;, t = &quot;nagaram&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">true</span></p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;rat&quot;, t = &quot;car&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">false</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length, t.length &lt;= 5 * 10<sup>4</sup></code></li>\n\t<li><code>s</code> and <code>t</code> consist of lowercase English letters.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> What if the inputs contain Unicode characters? How would you adapt your solution to such a case?</p>\n",
+  338: "<p>Given an integer <code>n</code>, return <em>an array </em><code>ans</code><em> of length </em><code>n + 1</code><em> such that for each </em><code>i</code><em> </em>(<code>0 &lt;= i &lt;= n</code>)<em>, </em><code>ans[i]</code><em> is the <strong>number of </strong></em><code>1</code><em><strong>&#39;s</strong> in the binary representation of </em><code>i</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> n = 2\n<strong>Output:</strong> [0,1,1]\n<strong>Explanation:</strong>\n0 --&gt; 0\n1 --&gt; 1\n2 --&gt; 10\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> n = 5\n<strong>Output:</strong> [0,1,1,2,1,2]\n<strong>Explanation:</strong>\n0 --&gt; 0\n1 --&gt; 1\n2 --&gt; 10\n3 --&gt; 11\n4 --&gt; 100\n5 --&gt; 101\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>0 &lt;= n &lt;= 10<sup>5</sup></code></li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong></p>\n\n<ul>\n\t<li>It is very easy to come up with a solution with a runtime of <code>O(n log n)</code>. Can you do it in linear time <code>O(n)</code> and possibly in a single pass?</li>\n\t<li>Can you do it without using any built-in function (i.e., like <code>__builtin_popcount</code> in C++)?</li>\n</ul>\n",
+  347: "<p>Given an integer array <code>nums</code> and an integer <code>k</code>, return <em>the</em> <code>k</code> <em>most frequent elements</em>. You may return the answer in <strong>any order</strong>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1,1,1,2,2,3], k = 2</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[1,2]</span></p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1], k = 1</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[1]</span></p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">nums = [1,2,1,2,1,2,3,1,3,2], k = 2</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[1,2]</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>\n\t<li><code>k</code> is in the range <code>[1, the number of unique elements in the array]</code>.</li>\n\t<li>It is <strong>guaranteed</strong> that the answer is <strong>unique</strong>.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> Your algorithm&#39;s time complexity must be better than <code>O(n log n)</code>, where n is the array&#39;s size.</p>\n",
+  572: "<p>Given the roots of two binary trees <code>root</code> and <code>subRoot</code>, return <code>true</code> if there is a subtree of <code>root</code> with the same structure and node values of<code> subRoot</code> and <code>false</code> otherwise.</p>\n\n<p>A subtree of a binary tree <code>tree</code> is a tree that consists of a node in <code>tree</code> and all of this node&#39;s descendants. The tree <code>tree</code> could also be considered as a subtree of itself.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/04/28/subtree1-tree.jpg\" style=\"width: 532px; height: 400px;\" />\n<pre>\n<strong>Input:</strong> root = [3,4,5,1,2], subRoot = [4,1,2]\n<strong>Output:</strong> true\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/04/28/subtree2-tree.jpg\" style=\"width: 502px; height: 458px;\" />\n<pre>\n<strong>Input:</strong> root = [3,4,5,1,2,null,null,null,null,0], subRoot = [4,1,2]\n<strong>Output:</strong> false\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the <code>root</code> tree is in the range <code>[1, 2000]</code>.</li>\n\t<li>The number of nodes in the <code>subRoot</code> tree is in the range <code>[1, 1000]</code>.</li>\n\t<li><code>-10<sup>4</sup> &lt;= root.val &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt;= subRoot.val &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+  703: "<p>You are part of a university admissions office and need to keep track of the <code>kth</code> highest test score from applicants in real-time. This helps to determine cut-off marks for interviews and admissions dynamically as new applicants submit their scores.</p>\n\n<p>You are tasked to implement a class which, for a given integer&nbsp;<code>k</code>, maintains a stream of test scores and continuously returns the&nbsp;<code>k</code>th highest test score&nbsp;<strong>after</strong>&nbsp;a new score has been submitted. More specifically, we are looking for the <code>k</code>th highest score in the sorted list of all scores.</p>\n\n<p>Implement the&nbsp;<code>KthLargest</code> class:</p>\n\n<ul>\n\t<li><code>KthLargest(int k, int[] nums)</code> Initializes the object with the integer <code>k</code> and the stream of test scores&nbsp;<code>nums</code>.</li>\n\t<li><code>int add(int val)</code> Adds a new test score&nbsp;<code>val</code> to the stream and returns the element representing the <code>k<sup>th</sup></code> largest element in the pool of test scores so far.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong><br />\n<span class=\"example-io\">[&quot;KthLargest&quot;, &quot;add&quot;, &quot;add&quot;, &quot;add&quot;, &quot;add&quot;, &quot;add&quot;]<br />\n[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[null, 4, 5, 5, 8, 8]</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);<br />\nkthLargest.add(3); // return 4<br />\nkthLargest.add(5); // return 5<br />\nkthLargest.add(10); // return 5<br />\nkthLargest.add(9); // return 8<br />\nkthLargest.add(4); // return 8</p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong><br />\n<span class=\"example-io\">[&quot;KthLargest&quot;, &quot;add&quot;, &quot;add&quot;, &quot;add&quot;, &quot;add&quot;]<br />\n[[4, [7, 7, 7, 7, 8, 3]], [2], [10], [9], [9]]</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">[null, 7, 7, 7, 8]</span></p>\n\n<p><strong>Explanation:</strong></p>\nKthLargest kthLargest = new KthLargest(4, [7, 7, 7, 7, 8, 3]);<br />\nkthLargest.add(2); // return 7<br />\nkthLargest.add(10); // return 7<br />\nkthLargest.add(9); // return 7<br />\nkthLargest.add(9); // return 8</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>0 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>1 &lt;= k &lt;= nums.length + 1</code></li>\n\t<li><code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt;= val &lt;= 10<sup>4</sup></code></li>\n\t<li>At most <code>10<sup>4</sup></code> calls will be made to <code>add</code>.</li>\n</ul>\n",
+  704: "<p>Given an array of integers <code>nums</code> which is sorted in ascending order, and an integer <code>target</code>, write a function to search <code>target</code> in <code>nums</code>. If <code>target</code> exists, then return its index. Otherwise, return <code>-1</code>.</p>\n\n<p>You must write an algorithm with <code>O(log n)</code> runtime complexity.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [-1,0,3,5,9,12], target = 9\n<strong>Output:</strong> 4\n<strong>Explanation:</strong> 9 exists in nums and its index is 4\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [-1,0,3,5,9,12], target = 2\n<strong>Output:</strong> -1\n<strong>Explanation:</strong> 2 does not exist in nums so return -1\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt; nums[i], target &lt; 10<sup>4</sup></code></li>\n\t<li>All the integers in <code>nums</code> are <strong>unique</strong>.</li>\n\t<li><code>nums</code> is sorted in ascending order.</li>\n</ul>\n",
+  746: "<p>You are given an integer array <code>cost</code> where <code>cost[i]</code> is the cost of <code>i<sup>th</sup></code> step on a staircase. Once you pay the cost, you can either climb one or two steps.</p>\n\n<p>You can either start from the step with index <code>0</code>, or the step with index <code>1</code>.</p>\n\n<p>Return <em>the minimum cost to reach the top of the floor</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> cost = [10,<u>15</u>,20]\n<strong>Output:</strong> 15\n<strong>Explanation:</strong> You will start at index 1.\n- Pay 15 and climb two steps to reach the top.\nThe total cost is 15.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> cost = [<u>1</u>,100,<u>1</u>,1,<u>1</u>,100,<u>1</u>,<u>1</u>,100,<u>1</u>]\n<strong>Output:</strong> 6\n<strong>Explanation:</strong> You will start at index 0.\n- Pay 1 and climb two steps to reach index 2.\n- Pay 1 and climb two steps to reach index 4.\n- Pay 1 and climb two steps to reach index 6.\n- Pay 1 and climb one step to reach index 7.\n- Pay 1 and climb two steps to reach index 9.\n- Pay 1 and climb one step to reach the top.\nThe total cost is 6.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= cost.length &lt;= 1000</code></li>\n\t<li><code>0 &lt;= cost[i] &lt;= 999</code></li>\n</ul>\n",
+};
+
+/* ===================== beginner roadmap ===================== */
+// [num, title, difficulty E/M/H, level 1=Beginner 2=Intermediate 3=Advanced]. NeetCode 150.
+const RECS = [
+  ["Arrays & Hashing", [
+    [217,"Contains Duplicate","E",1],[242,"Valid Anagram","E",1],[1,"Two Sum","E",1],
+    [49,"Group Anagrams","M",1],[347,"Top K Frequent Elements","M",1],[238,"Product of Array Except Self","M",1],
+    [271,"Encode and Decode Strings","M",2],[36,"Valid Sudoku","M",2],[128,"Longest Consecutive Sequence","M",2]]],
+  ["Two Pointers", [
+    [125,"Valid Palindrome","E",1],[167,"Two Sum II Input Array Is Sorted","M",1],[15,"3Sum","M",1],
+    [11,"Container With Most Water","M",2],[42,"Trapping Rain Water","H",3]]],
+  ["Sliding Window", [
+    [121,"Best Time to Buy and Sell Stock","E",1],[3,"Longest Substring Without Repeating Characters","M",1],
+    [424,"Longest Repeating Character Replacement","M",2],[567,"Permutation in String","M",2],
+    [76,"Minimum Window Substring","H",3],[239,"Sliding Window Maximum","H",3]]],
+  ["Stack", [
+    [20,"Valid Parentheses","E",1],[155,"Min Stack","M",1],[150,"Evaluate Reverse Polish Notation","M",2],
+    [22,"Generate Parentheses","M",2],[739,"Daily Temperatures","M",2],[853,"Car Fleet","M",2],
+    [84,"Largest Rectangle in Histogram","H",3]]],
+  ["Binary Search", [
+    [704,"Binary Search","E",1],[74,"Search a 2D Matrix","M",1],[875,"Koko Eating Bananas","M",2],
+    [153,"Find Minimum in Rotated Sorted Array","M",2],[33,"Search in Rotated Sorted Array","M",2],
+    [981,"Time Based Key Value Store","M",2],[4,"Median of Two Sorted Arrays","H",3]]],
+  ["Linked List", [
+    [206,"Reverse Linked List","E",1],[21,"Merge Two Sorted Lists","E",1],[141,"Linked List Cycle","E",1],
+    [143,"Reorder List","M",2],[19,"Remove Nth Node From End of List","M",2],[138,"Copy List with Random Pointer","M",2],
+    [2,"Add Two Numbers","M",2],[287,"Find the Duplicate Number","M",2],[146,"LRU Cache","M",2],
+    [23,"Merge k Sorted Lists","H",3],[25,"Reverse Nodes in k-Group","H",3]]],
+  ["Trees", [
+    [226,"Invert Binary Tree","E",1],[104,"Maximum Depth of Binary Tree","E",1],[100,"Same Tree","E",1],
+    [572,"Subtree of Another Tree","E",1],[102,"Binary Tree Level Order Traversal","M",1],
+    [543,"Diameter of Binary Tree","E",2],[110,"Balanced Binary Tree","E",2],
+    [235,"Lowest Common Ancestor of a Binary Search Tree","M",2],[199,"Binary Tree Right Side View","M",2],
+    [1448,"Count Good Nodes in Binary Tree","M",2],[98,"Validate Binary Search Tree","M",2],
+    [230,"Kth Smallest Element in a BST","M",2],[105,"Construct Binary Tree from Preorder and Inorder Traversal","M",2],
+    [124,"Binary Tree Maximum Path Sum","H",3],[297,"Serialize and Deserialize Binary Tree","H",3]]],
+  ["Tries", [
+    [208,"Implement Trie Prefix Tree","M",3],[211,"Design Add and Search Words Data Structure","M",3],
+    [212,"Word Search II","H",3]]],
+  ["Heap", [
+    [703,"Kth Largest Element in a Stream","E",1],[1046,"Last Stone Weight","E",2],
+    [973,"K Closest Points to Origin","M",2],[215,"Kth Largest Element in an Array","M",2],
+    [621,"Task Scheduler","M",2],[355,"Design Twitter","M",2],[295,"Find Median from Data Stream","H",3]]],
+  ["Backtracking", [
+    [78,"Subsets","M",1],[39,"Combination Sum","M",1],[46,"Permutations","M",2],[90,"Subsets II","M",2],
+    [40,"Combination Sum II","M",2],[79,"Word Search","M",2],[131,"Palindrome Partitioning","M",2],
+    [17,"Letter Combinations of a Phone Number","M",2],[51,"N Queens","H",3]]],
+  ["Graphs", [
+    [200,"Number of Islands","M",1],[133,"Clone Graph","M",2],[695,"Max Area of Island","M",2],
+    [417,"Pacific Atlantic Water Flow","M",2],[130,"Surrounded Regions","M",2],[994,"Rotting Oranges","M",2],
+    [286,"Walls and Gates","M",2],[207,"Course Schedule","M",2],[210,"Course Schedule II","M",2],
+    [684,"Redundant Connection","M",2],[323,"Number of Connected Components in an Undirected Graph","M",2],
+    [261,"Graph Valid Tree","M",2],[127,"Word Ladder","H",3]]],
+  ["Advanced Graphs", [
+    [743,"Network Delay Time","M",3],[1584,"Min Cost to Connect All Points","M",3],
+    [787,"Cheapest Flights Within K Stops","M",3],[332,"Reconstruct Itinerary","H",3],
+    [778,"Swim in Rising Water","H",3],[269,"Alien Dictionary","H",3]]],
+  ["1-D Dynamic Programming", [
+    [70,"Climbing Stairs","E",1],[746,"Min Cost Climbing Stairs","E",1],[198,"House Robber","M",1],
+    [213,"House Robber II","M",2],[5,"Longest Palindromic Substring","M",2],[647,"Palindromic Substrings","M",2],
+    [91,"Decode Ways","M",2],[322,"Coin Change","M",2],[152,"Maximum Product Subarray","M",2],
+    [139,"Word Break","M",2],[300,"Longest Increasing Subsequence","M",2],[416,"Partition Equal Subset Sum","M",2]]],
+  ["2-D Dynamic Programming", [
+    [62,"Unique Paths","M",3],[1143,"Longest Common Subsequence","M",3],
+    [309,"Best Time to Buy and Sell Stock with Cooldown","M",3],[518,"Coin Change II","M",3],
+    [494,"Target Sum","M",3],[97,"Interleaving String","M",3],[72,"Edit Distance","M",3],
+    [329,"Longest Increasing Path in a Matrix","H",3],[115,"Distinct Subsequences","H",3],
+    [312,"Burst Balloons","H",3],[10,"Regular Expression Matching","H",3]]],
+  ["Greedy", [
+    [53,"Maximum Subarray","M",1],[55,"Jump Game","M",2],[45,"Jump Game II","M",2],[134,"Gas Station","M",2],
+    [846,"Hand of Straights","M",2],[1899,"Merge Triplets to Form Target Triplet","M",2],
+    [763,"Partition Labels","M",2],[678,"Valid Parenthesis String","M",2]]],
+  ["Intervals", [
+    [56,"Merge Intervals","M",1],[57,"Insert Interval","M",2],[435,"Non overlapping Intervals","M",2],
+    [252,"Meeting Rooms","E",2],[253,"Meeting Rooms II","M",2],
+    [1851,"Minimum Interval to Include Each Query","H",3]]],
+  ["Bit Manipulation", [
+    [136,"Single Number","E",1],[191,"Number of 1 Bits","E",1],[338,"Counting Bits","E",1],
+    [190,"Reverse Bits","E",2],[268,"Missing Number","E",2],[371,"Sum of Two Integers","M",2],
+    [7,"Reverse Integer","M",2]]],
+  ["Math & Geometry", [
+    [202,"Happy Number","E",2],[66,"Plus One","E",2],[48,"Rotate Image","M",2],[54,"Spiral Matrix","M",2],
+    [73,"Set Matrix Zeroes","M",2],[50,"Pow x n","M",2],[43,"Multiply Strings","M",2],[2013,"Detect Squares","M",2]]]
+];
+const RECMAP = Object.fromEntries(RECS);
+let curLevel = 1;
+try{ const lv=+localStorage.getItem("lc-level"); if(lv>=1&&lv<=3) curLevel=lv; }catch(e){}
+const LEVEL_NAME = {1:"Beginner",2:"Intermediate",3:"Advanced"};
+// items of a topic visible at the current level (cumulative: level<=curLevel) — roadmap sidebar
+function recItems(topic){ return (RECMAP[topic]||[]).filter(it=>(it[3]||1)<=curLevel); }
+// items of a topic that belong to exactly one track/level — the split focus trees
+function itemsAt(topic,lvl){ return (RECMAP[topic]||[]).filter(it=>(it[3]||1)===lvl); }
+window.setLevel = v=>{
+  curLevel = +v;
+  try{ localStorage.setItem("lc-level", curLevel); }catch(e){}
+  document.querySelectorAll(".levelSel").forEach(s=>s.value=curLevel);
+  renderRecs();   // level only affects the roadmap sidebar; the focus tree is the full map
+};
+window.addFromRec = num=>{
+  for (const [,items] of RECS){
+    const it=items.find(x=>x[0]===num);
+    if (it){
+      if (state.problems.some(p=>p.num===num)) return;
+      const now=Date.now();
+      state.problems.push({num,title:it[1],url:"https://leetcode.com/problems/"+slug(it[1])+"/",added:now,card:newCard(3,now),history:[{t:now,g:3}]});
+      bumpActivity(); save(); renderAll(); return;
+    }
+  }
+};
+let openNote = null; // problem num currently shown in modal
+window.openRecNote = num=>{
+  const rec=RECS.flatMap(([,items])=>items).find(x=>x[0]===num); if(!rec) return;
+  openNote = num;
+  $("noteTitle").textContent = `${num}. ${rec[1]}`;
+  const diffEl=$("noteDiff");
+  diffEl.className="nm-diff "+rec[2];
+  diffEl.textContent = rec[2]==="E"?"Easy":rec[2]==="M"?"Medium":"Hard";
+  $("noteLink").href = `https://leetcode.com/problems/${slug(rec[1])}/`;
+  $("noteStmt").innerHTML = PROBLEM_HTML[num] || `<div class="lc-empty">No cached statement for this one yet — use the notes box below.</div>`;
+  $("noteText").value = state.notes[num] || "";
+  $("noteOverlay").classList.add("open");
+};
+window.closeNote = ()=>{
+  if (openNote!=null) { state.notes[openNote]=$("noteText").value; save(); }
+  openNote=null;
+  $("noteOverlay").classList.remove("open");
+};
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("noteOverlay").classList.contains("open")) closeNote(); });
+function renderRecs(){
+  const doneSet=new Set(state.problems.map(p=>p.num));
+  const todayK=dkey(new Date());
+  const newToday=state.problems.filter(p=>dkey(p.added)===todayK).length;
+  let picksLeft=Math.max(0, DAILY_GOAL-newToday);
+  let total=0, doneN=0, html="";
+  for (const [topic] of RECS){
+    const items=recItems(topic);
+    if(!items.length) continue;
+    html+=`<div class="topic">${topic}</div>`;
+    for (const [num,title,diff] of items){
+      total++;
+      const done=doneSet.has(num); if(done) doneN++;
+      const isPick=!done&&picksLeft>0; if(isPick) picksLeft--;
+      const hasNote=!!((state.notes[num]&&state.notes[num].trim())||PROBLEM_HTML[num]);
+      const url=`https://leetcode.com/problems/${slug(title)}/`;
+      html+=`<div class="rec${done?" done":""}${isPick?" next":""}">
+        <button class="exp${hasNote?" filled":""}" onclick="openRecNote(${num})" title="Read / edit problem text">▸</button>
+        ${done?`<span class="tick">✓</span>`
+             :`<button class="radd" onclick="addFromRec(${num})" title="Mark solved today">+</button>`}
+        <a href="${url}" target="_blank" rel="noopener">${num}. ${title}</a>
+        ${isPick?`<span class="next-tag">TODAY</span>`:""}
+        <span class="diff ${diff}">${diff==="E"?"Easy":diff==="M"?"Med":"Hard"}</span>
+      </div>`;
+    }
+  }
+  $("recList").innerHTML=html;
+  $("recProg").textContent = (newToday>=DAILY_GOAL
+    ? "🎉 daily goal hit · " : "today "+Math.min(newToday,DAILY_GOAL)+"/"+DAILY_GOAL+" · ")
+    + doneN+"/"+total+" in "+LEVEL_NAME[curLevel];
+}
+
+/* ---- Focus tree (HoI4 / NeetCode style) ---- */
+// canonical topic layout (col/row/prereqs). Replicated per difficulty track below.
+const BASE = [
+  {k:"Arrays & Hashing",        ic:"🗃️", col:3, row:0, pre:[],
+    desc:"Foundations: store and look up data in O(1) with hash maps/sets. Count, dedupe, and index in a single pass.",
+    ex:["Hash map for O(1) lookups","Sets to detect duplicates","Prefix products / frequency counts"],
+    code:[
+      {c:"Basic map: put / get / getOrDefault",
+       s:"Map<Character,Integer> m = new HashMap<>();\nm.put('a', 1);          // store\nm.get('a');             // -> 1\nm.getOrDefault('z', 0); // -> 0 (no key)"},
+      {c:"Count letters in a word",
+       s:"String w = \"banana\";\nMap<Character,Integer> cnt = new HashMap<>();\nfor (char c : w.toCharArray())\n    cnt.merge(c, 1, Integer::sum);\n// {b=1, a=3, n=2}"},
+      {c:"Set to spot a duplicate",
+       s:"Set<Integer> seen = new HashSet<>();\nfor (int x : nums)\n    if (!seen.add(x)) return true; // add=false => dup"}]},
+  {k:"Two Pointers",            ic:"↔️", col:2, row:1, pre:["Arrays & Hashing"],
+    desc:"Walk a sorted array from both ends (or same end) to find pairs/triples without nested loops.",
+    ex:["Left/right converging pointers","Pair sums on sorted input","In-place palindrome checks"],
+    code:[
+      {c:"Converging pointers for a pair sum",
+       s:"int l = 0, r = nums.length - 1;\nwhile (l < r) {\n    int sum = nums[l] + nums[r];\n    if (sum == target) return new int[]{l, r};\n    if (sum < target) l++; else r--;\n}"}]},
+  {k:"Stack",                   ic:"📚", col:4, row:1, pre:["Arrays & Hashing"],
+    desc:"LIFO structure for matching, undo, and 'most recent' logic. Backbone of parsing and monotonic tricks.",
+    ex:["Matching brackets","Min-stack via paired values","Monotonic stack (next greater)"],
+    code:[
+      {c:"push / pop / peek",
+       s:"Deque<Integer> st = new ArrayDeque<>();\nst.push(1);      // add on top\nst.peek();       // look: 1\nst.pop();        // remove: 1"},
+      {c:"Matching brackets",
+       s:"for (char c : s.toCharArray()) {\n    if (c == '(') st.push(')');\n    else if (st.isEmpty() || st.pop() != c) return false;\n}\nreturn st.isEmpty();"}]},
+  {k:"Binary Search",           ic:"🎯", col:1, row:2, pre:["Two Pointers"],
+    desc:"Halve the search space each step — O(log n). Works on sorted arrays and on answer ranges.",
+    ex:["Classic array search","Search in 2D matrix","Binary search on the answer"],
+    code:[
+      {c:"Find a target in a sorted array",
+       s:"int lo = 0, hi = nums.length - 1;\nwhile (lo <= hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (nums[mid] == target) return mid;\n    if (nums[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n}\nreturn -1;"}]},
+  {k:"Sliding Window",          ic:"🪟", col:2, row:2, pre:["Two Pointers"],
+    desc:"Maintain a moving sub-range to answer 'best/longest/shortest contiguous' questions in O(n).",
+    ex:["Longest substring w/o repeats","Max profit in one pass","Variable-size windows"],
+    code:[
+      {c:"Grow / shrink a window",
+       s:"int left = 0;\nSet<Character> win = new HashSet<>();\nfor (int right = 0; right < s.length(); right++) {\n    while (win.contains(s.charAt(right)))\n        win.remove(s.charAt(left++));   // shrink\n    win.add(s.charAt(right));           // grow\n    best = Math.max(best, right - left + 1);\n}"}]},
+  {k:"Linked List",             ic:"🔗", col:3, row:2, pre:["Two Pointers"],
+    desc:"Pointer manipulation on chained nodes: reversal, cycle detection, and merging.",
+    ex:["Iterative reversal","Fast/slow pointer for cycles","Merging two sorted lists"],
+    code:[
+      {c:"Reverse a list in place",
+       s:"ListNode prev = null, cur = head;\nwhile (cur != null) {\n    ListNode next = cur.next;\n    cur.next = prev;   // flip pointer\n    prev = cur;\n    cur = next;\n}\nreturn prev;"}]},
+  {k:"Trees",                   ic:"🌳", col:3, row:3, pre:["Linked List"],
+    desc:"Recursion over hierarchical data. DFS/BFS traversals and structural comparisons.",
+    ex:["Recursive DFS (depth, invert)","Level-order BFS with a queue","Subtree / same-tree checks"],
+    code:[
+      {c:"DFS: max depth via recursion",
+       s:"int depth(TreeNode node) {\n    if (node == null) return 0;\n    return 1 + Math.max(depth(node.left),\n                        depth(node.right));\n}"}]},
+  {k:"Tries",                   ic:"🔤", col:5, row:3, pre:["Trees"],
+    desc:"Prefix tree of characters for fast word insert/search and prefix (autocomplete) queries.",
+    ex:["Insert a word char-by-char","search / startsWith","Autocomplete & word games"],
+    code:[
+      {c:"Trie node + insert",
+       s:"class Node { Node[] kids = new Node[26]; boolean end; }\nvoid insert(String w) {\n    Node cur = root;\n    for (char c : w.toCharArray()) {\n        int i = c - 'a';\n        if (cur.kids[i] == null) cur.kids[i] = new Node();\n        cur = cur.kids[i];\n    }\n    cur.end = true;\n}"}]},
+  {k:"Heap",                    ic:"⛰️", col:5, row:4, pre:["Trees"],
+    desc:"Priority queue giving the min/max in O(log n). Ideal for 'top-K' and streaming problems.",
+    ex:["Kth largest in a stream","Top-K frequent elements","Merging k sorted sources"],
+    code:[
+      {c:"Min-heap keeping the K largest",
+       s:"PriorityQueue<Integer> pq = new PriorityQueue<>(); // min on top\nfor (int x : nums) {\n    pq.offer(x);\n    if (pq.size() > k) pq.poll(); // drop smallest\n}\nreturn pq.peek(); // Kth largest"}]},
+  {k:"Backtracking",            ic:"↩️", col:3, row:4, pre:["Trees"],
+    desc:"Build candidates incrementally and undo choices that fail. Explores combinatorial spaces.",
+    ex:["Subsets / power set","Combination sum","Prune-and-recurse patterns"],
+    code:[
+      {c:"Choose → recurse → un-choose",
+       s:"void dfs(int i, List<Integer> path) {\n    if (i == nums.length) { res.add(new ArrayList<>(path)); return; }\n    path.add(nums[i]);      // choose\n    dfs(i + 1, path);\n    path.remove(path.size() - 1); // undo\n    dfs(i + 1, path);\n}"}]},
+  {k:"Graphs",                  ic:"🕸️", col:2, row:5, pre:["Backtracking"],
+    desc:"Nodes and edges. Traverse with DFS/BFS; model grids, connectivity, and reachability.",
+    ex:["Flood fill / islands on a grid","BFS shortest path","Visited-set to avoid cycles"],
+    code:[
+      {c:"DFS flood fill on a grid",
+       s:"void dfs(int r, int c) {\n    if (r < 0 || c < 0 || r >= R || c >= C || grid[r][c] != '1') return;\n    grid[r][c] = '0';           // mark visited\n    dfs(r+1,c); dfs(r-1,c); dfs(r,c+1); dfs(r,c-1);\n}"}]},
+  {k:"1-D Dynamic Programming", ic:"🧩", col:4, row:5, pre:["Backtracking"],
+    desc:"Break a problem into overlapping subproblems and cache results. Turn exponential into linear.",
+    ex:["Climbing stairs (Fibonacci)","House robber (choose/skip)","Rolling two-variable state"],
+    code:[
+      {c:"Climbing stairs with rolling state",
+       s:"int a = 1, b = 1;          // ways to reach step i-1, i\nfor (int i = 2; i <= n; i++) {\n    int cur = a + b;\n    a = b; b = cur;\n}\nreturn b;"}]},
+  {k:"Advanced Graphs",         ic:"🛰️", col:1, row:6, pre:["Graphs"],
+    desc:"Weighted graphs and orderings: shortest paths (Dijkstra), minimum spanning trees, topological sort.",
+    ex:["Dijkstra with a min-heap","Union-Find / MST","Topological sort (Kahn's)"],
+    code:[
+      {c:"Dijkstra skeleton",
+       s:"PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->a[1]-b[1]);\npq.offer(new int[]{src, 0});\nwhile (!pq.isEmpty()) {\n    int[] cur = pq.poll();\n    int node = cur[0], d = cur[1];\n    if (dist[node] <= d) continue;\n    dist[node] = d;\n    for (int[] e : adj[node]) pq.offer(new int[]{e[0], d + e[1]});\n}"}]},
+  {k:"2-D Dynamic Programming", ic:"🧮", col:5, row:6, pre:["1-D Dynamic Programming"],
+    desc:"DP over a grid or table: two changing dimensions, filled bottom-up or with memoized recursion.",
+    ex:["Grid path counting","Edit distance / LCS","Knapsack-style choices"],
+    code:[
+      {c:"Unique paths in a grid",
+       s:"int[][] dp = new int[m][n];\nfor (int i = 0; i < m; i++) dp[i][0] = 1;\nfor (int j = 0; j < n; j++) dp[0][j] = 1;\nfor (int i = 1; i < m; i++)\n    for (int j = 1; j < n; j++)\n        dp[i][j] = dp[i-1][j] + dp[i][j-1];\nreturn dp[m-1][n-1];"}]},
+  {k:"Bit Manipulation",        ic:"🔢", col:4, row:7, pre:["1-D Dynamic Programming"],
+    desc:"Operate directly on bits with XOR/AND/shifts for O(1) tricks and compact state.",
+    ex:["XOR to find the single number","Counting set bits","n & (n-1) trick"],
+    code:[
+      {c:"XOR cancels pairs → the lone number",
+       s:"int res = 0;\nfor (int x : nums) res ^= x; // a^a=0, a^0=a\nreturn res;"},
+      {c:"Count set bits",
+       s:"int bits = 0;\nwhile (n != 0) { n &= (n - 1); bits++; } // clears lowest 1"}]},
+  {k:"Greedy",                  ic:"💰", col:3, row:6, pre:["1-D Dynamic Programming"],
+    desc:"Make the locally optimal choice at each step when it provably yields the global optimum.",
+    ex:["Max subarray (Kadane)","Interval / jump choices","Running best-so-far"],
+    code:[
+      {c:"Kadane's max subarray",
+       s:"int cur = nums[0], best = nums[0];\nfor (int i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]); // restart or extend\n    best = Math.max(best, cur);\n}\nreturn best;"}]},
+  {k:"Intervals",               ic:"📅", col:3, row:7, pre:["Greedy"],
+    desc:"Sort by start/end and sweep to merge, insert, or count overlapping ranges.",
+    ex:["Merge overlapping intervals","Insert into sorted intervals","Overlap counting"],
+    code:[
+      {c:"Merge overlapping intervals",
+       s:"Arrays.sort(iv, (a, b) -> a[0] - b[0]);\nfor (int[] cur : iv) {\n    if (!res.isEmpty() && cur[0] <= res.getLast()[1])\n        res.getLast()[1] = Math.max(res.getLast()[1], cur[1]);\n    else res.add(cur);\n}"}]},
+  // standalone branch (not linked to the core tree)
+  {k:"Math & Geometry",         ic:"📐", col:6, row:0, pre:[],
+    desc:"Number theory and grid geometry: digit tricks, matrix rotation, and coordinate sweeps.",
+    ex:["Rotate a matrix in place","Spiral / layer traversal","Fast power, digit cycles"],
+    code:[
+      {c:"Rotate matrix 90° in place",
+       s:"int n = a.length;\nfor (int i = 0; i < n; i++)          // transpose\n    for (int j = i+1; j < n; j++) {\n        int t = a[i][j]; a[i][j] = a[j][i]; a[j][i] = t;\n    }\nfor (int[] row : a)                  // reverse each row\n    for (int l = 0, r = n-1; l < r; l++, r--) {\n        int t = row[l]; row[l] = row[r]; row[r] = t;\n    }"}]},
+];
+// Harder examples surfaced on the Intermediate/Advanced tracks (keyed by topic).
+const CODE_HARD = {
+  "Arrays & Hashing":[{c:"Longest consecutive sequence in O(n)",
+    s:"Set<Integer> set = new HashSet<>(); for (int x : nums) set.add(x);\nint best = 0;\nfor (int x : set) {\n    if (set.contains(x - 1)) continue;   // only start of a run\n    int len = 1;\n    while (set.contains(x + len)) len++;\n    best = Math.max(best, len);\n}"}],
+  "Two Pointers":[{c:"3Sum: fix one, two-pointer the rest",
+    s:"Arrays.sort(nums);\nfor (int i = 0; i < nums.length - 2; i++) {\n    if (i > 0 && nums[i] == nums[i-1]) continue;   // skip dup\n    int l = i + 1, r = nums.length - 1;\n    while (l < r) {\n        int sum = nums[i] + nums[l] + nums[r];\n        if (sum < 0) l++; else if (sum > 0) r--;\n        else { res.add(List.of(nums[i], nums[l++], nums[r--])); }\n    }\n}"}],
+  "Sliding Window":[{c:"Minimum window substring (need/have counts)",
+    s:"int[] need = new int[128];\nfor (char c : t.toCharArray()) need[c]++;\nint have = t.length(), l = 0, lo = 0, len = INF;\nfor (int r = 0; r < s.length(); r++) {\n    if (need[s.charAt(r)]-- > 0) have--;\n    while (have == 0) {                     // valid → shrink\n        if (r - l + 1 < len) { len = r - l + 1; lo = l; }\n        if (++need[s.charAt(l++)] > 0) have++;\n    }\n}"}],
+  "Stack":[{c:"Monotonic stack: next greater element",
+    s:"int[] res = new int[n]; Arrays.fill(res, -1);\nDeque<Integer> st = new ArrayDeque<>();   // holds indices\nfor (int i = 0; i < n; i++) {\n    while (!st.isEmpty() && nums[i] > nums[st.peek()])\n        res[st.pop()] = nums[i];\n    st.push(i);\n}"}],
+  "Binary Search":[{c:"Binary search on the answer (Koko)",
+    s:"int lo = 1, hi = max;\nwhile (lo < hi) {\n    int k = (lo + hi) / 2, hours = 0;\n    for (int p : piles) hours += (p + k - 1) / k;   // ceil\n    if (hours <= H) hi = k; else lo = k + 1;\n}\nreturn lo;"}],
+  "Linked List":[{c:"Floyd's cycle detection (fast/slow)",
+    s:"ListNode slow = head, fast = head;\nwhile (fast != null && fast.next != null) {\n    slow = slow.next;\n    fast = fast.next.next;\n    if (slow == fast) return true;   // pointers met → cycle\n}\nreturn false;"}],
+  "Trees":[{c:"Level-order traversal (BFS with a queue)",
+    s:"Queue<TreeNode> q = new LinkedList<>();\nif (root != null) q.add(root);\nwhile (!q.isEmpty()) {\n    int sz = q.size();\n    List<Integer> level = new ArrayList<>();\n    for (int i = 0; i < sz; i++) {\n        TreeNode n = q.poll();\n        level.add(n.val);\n        if (n.left != null) q.add(n.left);\n        if (n.right != null) q.add(n.right);\n    }\n    res.add(level);\n}"}],
+  "Heap":[{c:"Running median with two heaps",
+    s:"PriorityQueue<Integer> lo = new PriorityQueue<>((a,b)->b-a); // max-heap\nPriorityQueue<Integer> hi = new PriorityQueue<>();            // min-heap\nvoid add(int x) {\n    lo.offer(x); hi.offer(lo.poll());\n    if (hi.size() > lo.size()) lo.offer(hi.poll());\n}\ndouble median() { return lo.size() > hi.size() ? lo.peek() : (lo.peek() + hi.peek()) / 2.0; }"}],
+  "Backtracking":[{c:"Permutations with a used[] flag",
+    s:"void dfs(List<Integer> path, boolean[] used) {\n    if (path.size() == nums.length) { res.add(new ArrayList<>(path)); return; }\n    for (int i = 0; i < nums.length; i++) {\n        if (used[i]) continue;\n        used[i] = true; path.add(nums[i]);\n        dfs(path, used);\n        used[i] = false; path.remove(path.size() - 1);\n    }\n}"}],
+  "Graphs":[{c:"Topological sort (Kahn's, BFS on in-degree)",
+    s:"int[] indeg = new int[n];\nfor (int[] e : edges) indeg[e[1]]++;\nQueue<Integer> q = new LinkedList<>();\nfor (int i = 0; i < n; i++) if (indeg[i] == 0) q.add(i);\nwhile (!q.isEmpty()) {\n    int u = q.poll(); order.add(u);\n    for (int v : adj[u]) if (--indeg[v] == 0) q.add(v);\n}\n// order.size() < n  =>  cycle"}],
+  "1-D Dynamic Programming":[{c:"Coin change: fewest coins (bottom-up)",
+    s:"int[] dp = new int[amount + 1];\nArrays.fill(dp, amount + 1);\ndp[0] = 0;\nfor (int a = 1; a <= amount; a++)\n    for (int c : coins)\n        if (c <= a) dp[a] = Math.min(dp[a], dp[a - c] + 1);\nreturn dp[amount] > amount ? -1 : dp[amount];"}],
+  "Greedy":[{c:"Jump Game: farthest reachable index",
+    s:"int reach = 0;\nfor (int i = 0; i < nums.length; i++) {\n    if (i > reach) return false;        // stuck\n    reach = Math.max(reach, i + nums[i]);\n}\nreturn true;"}],
+  "Intervals":[{c:"Max non-overlapping intervals (sort by end)",
+    s:"Arrays.sort(iv, (a, b) -> a[1] - b[1]);\nint end = Integer.MIN_VALUE, keep = 0;\nfor (int[] cur : iv)\n    if (cur[0] >= end) { end = cur[1]; keep++; }   // greedily keep\nint removals = iv.length - keep;"}],
+  "Bit Manipulation":[{c:"Add two ints without + (XOR + carry)",
+    s:"while (b != 0) {\n    int carry = (a & b) << 1;   // where both bits are 1\n    a = a ^ b;                  // sum without carry\n    b = carry;\n}\nreturn a;"}],
+  "Math & Geometry":[{c:"Spiral matrix traversal",
+    s:"int top = 0, bot = m-1, left = 0, right = n-1;\nwhile (top <= bot && left <= right) {\n    for (int j = left; j <= right; j++) res.add(a[top][j]); top++;\n    for (int i = top; i <= bot; i++)  res.add(a[i][right]); right--;\n    if (top <= bot) { for (int j = right; j >= left; j--) res.add(a[bot][j]); bot--; }\n    if (left <= right) { for (int i = bot; i >= top; i--) res.add(a[i][left]); left++; }\n}"}]
+};
+const COLW=176, ROWH=118, NODE_W=160, NODE_H=78, PAD=14;
+const TRACKS=[{lvl:1,name:"Beginner"},{lvl:2,name:"Intermediate"},{lvl:3,name:"Advanced"}];
+const TRACK_GAP=0.5;   // columns of empty space between adjacent track boxes (tight)
+// Each track gets its OWN outline so the three trees look distinct. [col,row] per topic.
+const LAYOUTS={
+  Beginner:{   // symmetric arrow
+    "Arrays & Hashing":[2,0],
+    "Two Pointers":[1,1],"Stack":[3,1],
+    "Binary Search":[0,2],"Sliding Window":[1,2],"Linked List":[2,2],
+    "Trees":[2,3],
+    "Backtracking":[2,4],"Heap":[4,4],
+    "Graphs":[1,5],"1-D Dynamic Programming":[3,5],
+    "Greedy":[3,6],"Bit Manipulation":[4,6],
+    "Intervals":[3,7]
+  },
+  Intermediate:{   // wide candelabra + standalone Math pillar on the left
+    "Math & Geometry":[0,1],
+    "Arrays & Hashing":[3,0],
+    "Two Pointers":[2,1],"Stack":[4,1],
+    "Binary Search":[1,2],"Sliding Window":[2,2],"Linked List":[3,2],
+    "Trees":[3,3],
+    "Backtracking":[3,4],"Heap":[5,4],
+    "Graphs":[2,5],"1-D Dynamic Programming":[4,5],
+    "Greedy":[3,6],"Bit Manipulation":[5,6],
+    "Intervals":[3,7]
+  },
+  Advanced:{   // multi-root, no Arrays base; detached 2-D DP & Intervals pillars
+    "Two Pointers":[1,0],"Stack":[4,0],
+    "Binary Search":[0,1],"Sliding Window":[1,1],"Linked List":[2,1],
+    "2-D Dynamic Programming":[5,1],
+    "Trees":[2,2],
+    "Tries":[1,3],"Backtracking":[2,3],"Heap":[3,3],"Intervals":[5,3],
+    "Graphs":[2,4],
+    "Advanced Graphs":[2,5]
+  }
+};
+// Build the real node list: one detached sub-tree per difficulty track, side by side.
+const TREE=[];
+let xOffset=0;
+TRACKS.forEach((tr,ti)=>{
+  const present=new Set(BASE.filter(b=>itemsAt(b.k,tr.lvl).length>0).map(b=>b.k));
+  const lay=LAYOUTS[tr.name]||{};
+  const nodes=[];
+  for(const b of BASE){
+    if(!present.has(b.k)) continue;
+    const pos=lay[b.k]||[b.col,b.row];
+    nodes.push({
+      key:b.k+"#"+tr.lvl, k:b.k, lvl:tr.lvl, track:tr.name, ti,
+      ic:b.ic, col:pos[0], row:pos[1]+1,   // row+1 leaves room for track labels
+      pre:b.pre.filter(p=>present.has(p)).map(p=>p+"#"+tr.lvl),
+      desc:b.desc, ex:b.ex, code:b.code, codeHard:CODE_HARD[b.k]
+    });
+  }
+  // pack tracks left-to-right with a constant column gap between clusters
+  const minC=Math.min(...nodes.map(n=>n.col)), maxC=Math.max(...nodes.map(n=>n.col));
+  for(const n of nodes){ n.col = n.col - minC + xOffset; TREE.push(n); }
+  xOffset += (maxC - minC + 1) + TRACK_GAP;
+});
+let selTopic=null, treeW=0, treeH=0;   // selTopic holds a node .key
+const TREE_BY=Object.fromEntries(TREE.map(n=>[n.key,n]));
+
+function topicStat(node){
+  const items = itemsAt(node.k, node.lvl);
+  const doneSet=new Set(state.problems.map(p=>p.num));
+  const total=items.length, done=items.filter(x=>doneSet.has(x[0])).length;
+  return {total, done, mastered: total>0 && done===total};
+}
+// transitive prerequisite keys of a node
+function ancestors(key){
+  const out=new Set(); const stack=[...(TREE_BY[key]?.pre||[])];
+  while(stack.length){ const k=stack.pop(); if(out.has(k))continue; out.add(k);
+    for(const p of (TREE_BY[k]?.pre||[])) stack.push(p); }
+  return [...out];
+}
+// projected date this locked topic becomes available, given DAILY_GOAL/day
+function unlockDate(key){
+  const doneSet=new Set(state.problems.map(p=>p.num));
+  let remaining=0;
+  for(const a of ancestors(key)){
+    const an=TREE_BY[a]; if(!an) continue;
+    for(const [num] of itemsAt(an.k, an.lvl)) if(!doneSet.has(num)) remaining++;
+  }
+  const days=Math.max(1, Math.ceil(remaining/DAILY_GOAL));
+  const d=new Date(); d.setDate(d.getDate()+days);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+}
+function renderTree(){
+  const stat={}; for(const n of TREE) stat[n.key]=topicStat(n);
+  const state_ = {};
+  for(const n of TREE){
+    const s=stat[n.key];
+    const unlocked = n.pre.every(p=>stat[p] && stat[p].mastered);
+    state_[n.key] = s.mastered ? "mastered"
+      : !unlocked ? "locked"
+      : s.done>0 ? "progress" : "available";
+  }
+  const vis=TREE;                         // every node is already non-empty by construction
+  const visSet=new Set(vis.map(n=>n.key));
+  const maxCol=Math.max(...vis.map(n=>n.col)), maxRow=Math.max(...vis.map(n=>n.row));
+  const W=(maxCol+1)*COLW, H=(maxRow+1)*ROWH; treeW=W; treeH=H;
+  const cx=n=>n.col*COLW+COLW/2, cy=n=>n.row*ROWH+ROWH/2;
+  const canvas=$("treeCanvas"); canvas.style.width=W+"px"; canvas.style.height=H+"px";
+  const svg=$("treeSvg"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+
+  // connectors: parent -> child, orthogonal elbow
+  let paths="";
+  for(const n of vis){
+    for(const pk of n.pre){
+      const p=TREE_BY[pk]; if(!p || !visSet.has(pk)) continue;
+      const x1=cx(p), y1=cy(p)+NODE_H/2, x2=cx(n), y2=cy(n)-NODE_H/2;
+      const mid=(y1+y2)/2;
+      const cls = stat[pk].mastered ? (state_[n.key]==="available"?"flow":"lit") : "";
+      paths+=`<path class="${cls}" d="M${x1} ${y1} L${x1} ${mid} L${x2} ${mid} L${x2} ${y2}"/>`;
+    }
+  }
+  svg.innerHTML=paths;
+
+  // nodes
+  let html=svg.outerHTML;
+  // an outlined box around each track cluster, label pinned to its top-left
+  const PADX=30, PADB=26, PADT=52;   // PADT leaves room for the label row
+  TRACKS.forEach((tr,ti)=>{
+    const band=TREE.filter(n=>n.track===tr.name); if(!band.length) return;
+    const left=Math.min(...band.map(n=>cx(n)))-NODE_W/2-PADX;
+    const right=Math.max(...band.map(n=>cx(n)))+NODE_W/2+PADX;
+    const top=Math.min(...band.map(n=>cy(n)))-NODE_H/2-PADT;
+    const bot=Math.max(...band.map(n=>cy(n)))+NODE_H/2+PADB;
+    const n=band.length, done=band.filter(b=>state_[b.key]==="mastered").length;
+    html+=`<div class="track-box t${tr.lvl}" style="left:${left}px;top:${top}px;width:${right-left}px;height:${bot-top}px"></div>`;
+    html+=`<div class="track-label" style="left:${left+16}px;top:${top+12}px">
+      <span class="tl-name">${tr.name}</span><span class="tl-count">${done}/${n} topics</span></div>`;
+  });
+  for(const n of vis){
+    const s=stat[n.key], st=state_[n.key];
+    const pct = s.total? Math.round(s.done/s.total*100):0;
+    const badge = st==="mastered"?"✓ SOLVED"
+      : st==="locked"?("🔒 "+unlockDate(n.key))
+      : st==="available"?"START"
+      : s.done+"/"+s.total;
+    html+=`<div class="node ${st}${selTopic===n.key?" sel":""}" style="left:${cx(n)}px;top:${cy(n)}px"
+        onclick="selectTopic('${n.key.replace(/'/g,"\\'")}')" title="${n.k} · ${n.track}">
+      <div class="n-top"><span class="n-ic">${n.ic}</span><span class="n-ttl">${n.k}</span></div>
+      <div class="n-bar"><i style="width:${pct}%"></i></div>
+      <div class="n-meta"><span>${s.done}/${s.total}</span><span class="n-badge">${badge}</span></div>
+    </div>`;
+  }
+  html+=`<div id="treeDetail"></div>`;
+  canvas.innerHTML=html;
+
+  const masteredN=vis.filter(n=>state_[n.key]==="mastered").length;
+  $("treeProg").textContent=masteredN+"/"+vis.length+" topics solved";
+
+  renderTreeDetail();
+}
+function renderTreeDetail(){
+  const d=$("treeDetail");
+  const node = selTopic ? TREE_BY[selTopic] : null;
+  if(!node){ d.classList.remove("open"); d.innerHTML=""; return; }
+  const items=itemsAt(node.k, node.lvl);
+  const doneSet=new Set(state.problems.map(p=>p.num));
+  const s=topicStat(node);
+  let rows="";
+  for(const [num,title,diff] of items){
+    const done=doneSet.has(num);
+    const hasNote=!!((state.notes[num]&&state.notes[num].trim())||PROBLEM_HTML[num]);
+    const url=`https://leetcode.com/problems/${slug(title)}/`;
+    rows+=`<div class="rec${done?" done":""}">
+      <button class="exp${hasNote?" filled":""}" onclick="openRecNote(${num})" title="Read / edit problem text">▸</button>
+      ${done?`<span class="tick">✓</span>`
+           :`<button class="radd" onclick="addFromRec(${num})" title="Mark solved today">+</button>`}
+      <a href="${url}" target="_blank" rel="noopener">${num}. ${title}</a>
+      <span class="diff ${diff}">${diff==="E"?"Easy":diff==="M"?"Med":"Hard"}</span>
+    </div>`;
+  }
+  const esc=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const block=b=>`<div class="td-code"><span class="td-cap">${b.c}</span><pre><code>${esc(b.s)}</code></pre></div>`;
+  const exHtml=node.ex?`<ul class="td-ex">${node.ex.map(x=>`<li>${x}</li>`).join("")}</ul>`:"";
+  const codeHtml=node.code?node.code.map(block).join(""):"";
+  // harder examples only surface on the Intermediate/Advanced tracks
+  const hardHtml=(node.lvl>=2 && node.codeHard)?node.codeHard.map(block).join(""):"";
+  d.innerHTML=`<div class="td-head">
+      <h3>${node.ic} ${node.k}</h3>
+      <span class="td-track t${node.lvl}">${node.track}</span>
+      <button class="td-x" onclick="selectTopic('${selTopic.replace(/'/g,"\\'")}')" title="Close">✕</button>
+    </div>
+    ${node.desc?`<p class="td-desc">${node.desc}</p>`:""}
+    ${exHtml?`<div class="td-sec">What you'll learn</div>${exHtml}`:""}
+    ${codeHtml?`<div class="td-sec">Examples</div>${codeHtml}`:""}
+    ${hardHtml?`<div class="td-sec">Harder examples</div>${hardHtml}`:""}
+    <div class="td-sec">Problems <span class="td-badge">${s.done}/${s.total} solved</span></div>
+    <div class="td-list">${rows}</div>`;
+  d.classList.add("open");
+  // position as a floating card below the selected node (HoI4 focus style)
+  const DW=380;
+  const cnx=node.col*COLW+COLW/2, cny=node.row*ROWH+ROWH/2;
+  let left=cnx-DW/2;
+  left=Math.max(4, Math.min(left, Math.max(4, treeW-DW-4)));
+  const top=cny+NODE_H/2+12;
+  d.style.left=left+"px"; d.style.top=top+"px"; d.style.width=DW+"px";
+  d.style.setProperty("--arrow",(cnx-left)+"px");
+}
+window.selectTopic = k=>{ selTopic = selTopic===k ? null : k; renderTree(); };
+// click anywhere outside a node / the card closes the open focus card
+document.addEventListener("click", e=>{
+  if(treeDragged){ treeDragged=false; return; }   // ignore click that ended a pan
+  if(selTopic==null) return;
+  if(e.target.closest(".node") || e.target.closest("#treeDetail")) return;
+  selTopic=null; renderTree();
+});
+window.toggleTree = ()=>{
+  const p=$("treePanel"); const open=p.classList.toggle("open");
+  try{ localStorage.setItem("lc-tree-open", open?"1":"0"); }catch(e){}
+  if(open){ renderTree(); initTreeField(); if(!viewInit){ viewInit=true; centerTree(); } else applyTransform(); }
+};
+try{ if(localStorage.getItem("lc-tree-open")==="1") $("treePanel").classList.add("open"); }catch(e){}
+
+window.toggleAch = ()=>{
+  const open=$("achPanel").classList.toggle("open");
+  try{ localStorage.setItem("lc-ach-open", open?"1":"0"); }catch(e){}
+};
+try{ if(localStorage.getItem("lc-ach-open")==="1") $("achPanel").classList.add("open"); }catch(e){}
+
+/* ---- pan & zoom 2D field ---- */
+let panX=0, panY=0, zoom=1, viewInit=false;
+const ZMIN=0.2, ZMAX=2.5, GRID=26;
+function applyTransform(){
+  const c=$("treeCanvas"); if(!c) return;
+  c.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;
+  const vp=$("treeViewport");
+  vp.style.backgroundSize=(GRID*zoom)+"px "+(GRID*zoom)+"px";
+  vp.style.backgroundPosition=panX+"px "+panY+"px";
+  const zl=$("zLvl"); if(zl) zl.textContent=Math.round(zoom*100)+"%";
+}
+function centerTree(){
+  const vp=$("treeViewport"); if(!vp) return;
+  const vw=vp.clientWidth, vh=vp.clientHeight;
+  const fit=Math.min(1, (vw-40)/Math.max(1,treeW));
+  zoom=Math.max(ZMIN, Math.min(ZMAX, fit));
+  panX=(vw - treeW*zoom)/2;
+  panY=Math.max(16, (vh - treeH*zoom)/2);
+  applyTransform();
+}
+window.treeReset=()=>{ centerTree(); };
+window.treeZoomBtn=dir=>{
+  const vp=$("treeViewport"); const cx=vp.clientWidth/2, cy=vp.clientHeight/2;
+  zoomAt(cx, cy, dir>0?1.2:1/1.2);
+};
+function zoomAt(px, py, factor){
+  const z2=Math.max(ZMIN, Math.min(ZMAX, zoom*factor));
+  const wx=(px-panX)/zoom, wy=(py-panY)/zoom;   // world point under cursor
+  panX=px - wx*z2; panY=py - wy*z2; zoom=z2;
+  applyTransform();
+}
+function initTreeField(){
+  const vp=$("treeViewport"); if(!vp || vp.dataset.wired) return; vp.dataset.wired="1";
+  vp.addEventListener("wheel", e=>{
+    if(e.target.closest("#treeDetail")) return;   // let the open card scroll
+    e.preventDefault();
+    const r=vp.getBoundingClientRect();
+    zoomAt(e.clientX-r.left, e.clientY-r.top, e.deltaY<0?1.1:1/1.1);
+  }, {passive:false});
+  let dragging=false, moved=false, sx=0, sy=0, spx=0, spy=0;
+  vp.addEventListener("pointerdown", e=>{
+    if(e.target.closest(".node") || e.target.closest("#treeDetail") || e.target.closest(".tree-zoom")) return;
+    dragging=true; moved=false; sx=e.clientX; sy=e.clientY; spx=panX; spy=panY;
+    vp.classList.add("grabbing"); vp.setPointerCapture(e.pointerId);
+  });
+  vp.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(Math.abs(dx)+Math.abs(dy)>4) moved=true;
+    panX=spx+dx; panY=spy+dy; applyTransform();
+  });
+  const end=()=>{ if(!dragging) return; dragging=false; vp.classList.remove("grabbing");
+    if(moved) treeDragged=true; };
+  vp.addEventListener("pointerup", end);
+  vp.addEventListener("pointercancel", end);
+}
+let treeDragged=false;
+
+function renderAll(){ renderTiles(); renderHeatmap(); renderBadges(); renderQueue(); renderRoulette(); renderTable(); renderRecs(); renderTree(); }
+document.querySelectorAll(".levelSel").forEach(s=>s.value=curLevel);
+renderAll();
+if($("treePanel").classList.contains("open")){ initTreeField(); viewInit=true; centerTree(); }
+</script>
+</body>
+</html>
