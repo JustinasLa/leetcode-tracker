@@ -470,7 +470,7 @@
   <header>
     <div>
       <h1>LeetCode Solution Tracker <span>· FSRS</span></h1>
-      <div class="sub">Spaced repetition with the FSRS forgetting-curve model — review before you forget.</div>
+      <div class="sub">spaced repetition w fsrs so u dont forget shit</div>
     </div>
     <div class="hdr-btns">
       <button id="themeBtn" class="theme-btn" title="Toggle light / dark theme" aria-pressed="false"></button>
@@ -486,7 +486,7 @@
 
   <div class="card" id="treePanel">
     <div class="tree-head" onclick="toggleTree()">
-      <h2>Focus Tree <span class="badge" id="treeProg"></span></h2>
+      <h2>focus tree <span class="badge" id="treeProg"></span></h2>
       <span class="chev">▶</span>
     </div>
     <div class="tree-body">
@@ -510,7 +510,7 @@
   </div>
 
   <div class="card">
-    <h2>Activity <span class="badge" id="yearTotal"></span><select id="yearSel"></select></h2>
+    <h2>activity <span class="badge" id="yearTotal"></span><select id="yearSel"></select></h2>
     <div class="hm-scroll">
       <div class="hm-months" id="hmMonths"></div>
       <div class="hm" id="hm"></div>
@@ -528,19 +528,19 @@
 
   <div class="card" id="achPanel">
     <div class="tree-head" onclick="toggleAch()">
-      <h2>Achievements <span class="badge" id="achCount"></span></h2>
+      <h2>achievements <span class="badge" id="achCount"></span></h2>
       <span class="chev">▶</span>
     </div>
     <div class="tree-body"><div id="achList"></div></div>
   </div>
 
   <div class="card">
-    <h2>Due for review <span class="badge" id="dueCount"></span></h2>
+    <h2>due for review <span class="badge" id="dueCount"></span></h2>
     <div id="queue"></div>
   </div>
 
   <div class="card">
-    <h2>Review roulette <span class="badge" id="spinCount"></span></h2>
+    <h2>review roulette <span class="badge" id="spinCount"></span></h2>
     <div id="roulette"></div>
   </div>
 
@@ -551,23 +551,23 @@
   </div>
 
   <div class="card">
-    <h2>Add solved problem</h2>
+    <h2>add solved problem</h2>
     <div class="addrow">
       <input id="addNum" type="number" min="1" placeholder="#">
       <input id="addTitle" type="text" placeholder="Title (e.g. Two Sum)">
-      <button class="primary" id="addBtn">Add — solved today</button>
+      <button class="primary" id="addBtn">add, solved today</button>
     </div>
   </div>
 
   <div class="card">
-    <h2>All problems <span class="badge" id="allCount"></span></h2>
+    <h2>all problems <span class="badge" id="allCount"></span></h2>
     <div class="table-scroll"><table>
       <thead><tr><th>#</th><th>Title</th><th>Recall now</th><th>Stability</th><th>Next review</th><th>Reps</th><th>Lapses</th><th></th></tr></thead>
       <tbody id="tbody"></tbody>
     </table></div>
   </div>
 
-  <footer>FSRS-5 scheduler · target retention 95% · max interval 60d · data lives in this browser (localStorage) — Load/Save syncs it with your private GitHub repo</footer>
+  <footer>fsrs-5 · 95% retention · max 60d · data lives in this browser, load/save syncs it w github</footer>
 </div>
 </div>
 <div id="hmTip"></div>
@@ -575,11 +575,11 @@
   <div id="noteModal">
     <div class="nm-head">
       <div class="nm-title"><h3 id="noteTitle"></h3><span id="noteDiff" class="nm-diff"></span></div>
-      <div style="display:flex;align-items:center;gap:14px"><a id="noteLink" target="_blank" rel="noopener">Open on LeetCode ↗</a> <button class="nm-x" onclick="closeNote()" title="Close (Esc)">✕</button></div>
+      <div style="display:flex;align-items:center;gap:14px"><a id="noteLink" target="_blank" rel="noopener">open on leetcode ↗</a> <button class="nm-x" onclick="closeNote()" title="Close (Esc)">✕</button></div>
     </div>
     <div class="nm-body">
       <div id="noteStmt" class="lc-stmt"></div>
-      <div class="nm-notes-label">Your notes</div>
+      <div class="nm-notes-label">ur notes</div>
       <textarea id="noteText" placeholder="Add your own notes, gotchas, or a paste of the statement if it's missing above..."></textarea>
     </div>
   </div>
@@ -981,7 +981,7 @@ function renderQueue(){
   const q = state.problems.filter(p=>dueInfo(p).due)
     .sort((a,b)=>a.card.due-b.card.due);
   $("dueCount").textContent = q.length ? q.length+" waiting" : "all clear";
-  if (!q.length){ $("queue").innerHTML = `<div class="empty">Nothing due. Come back when the forgetting curve says so. 🎉</div>`; return; }
+  if (!q.length){ $("queue").innerHTML = `<div class="empty">nothing due rn, come back when ur brain starts forgetting 💀</div>`; return; }
   $("queue").innerHTML = q.map(p=>{
     const r=Math.round(recallNow(p)*100), di=dueInfo(p);
     const now=Date.now();
@@ -1115,7 +1115,7 @@ window.spinClear = ()=>{ spinPick=null; renderRoulette(); };
 
 function spinResultHtml(pool){
   if (spinPick==null || !state.problems.some(p=>p.num===spinPick)){
-    return `<div class="spin-hint">Nothing due but still want to solve? Spin the wheel — ${pool.length} resting ${pool.length===1?"problem":"problems"} on it. Whatever it lands on stays exactly where it is in the schedule.</div>`;
+    return `<div class="spin-hint">nothing due but still wanna grind? spin it, ${pool.length} chillin on the wheel. whatever it lands on stays where it is</div>`;
   }
   const p = state.problems.find(x=>x.num===spinPick);
   const d = diffOf(p.num), dTitle = d==="E"?"Easy":d==="M"?"Medium":d==="H"?"Hard":"";
@@ -1131,8 +1131,8 @@ function spinResultHtml(pool){
       <div class="qmeta">est. recall ${Math.round(recallNow(p)*100)}% · next review ${fmtDate(p.card.due)}</div>
     </div>
     <div class="spin-row">
-      <button class="primary" onclick="spinDone()">Solved it 👍</button>
-      <button class="g2" onclick="spinRusty()">Rusty — review it now</button>
+      <button class="primary" onclick="spinDone()">got it, ez</button>
+      <button class="g2" onclick="spinRusty()">rusty, review it rn</button>
       ${hasStmt?`<button onclick="openRecNote(${p.num})">Read statement</button>`:""}
       <button class="del" style="margin-left:auto" onclick="spinClear()" title="Put it back">✕</button>
     </div>
@@ -1146,7 +1146,7 @@ function renderRoulette(){
   const pool = spinPool();
   if (!pool.length){
     spinPick=null;
-    box.innerHTML = `<div class="empty">Nothing to spin — everything you track is already due for review.</div>`;
+    box.innerHTML = `<div class="empty">nothing to spin, everything u track is already due lmao</div>`;
     return;
   }
   box.innerHTML = `<div class="wheel-wrap">
@@ -1198,13 +1198,13 @@ function renderTable(){
         return `<button class="g${g}" onclick="rate(${p.num},${g})">${GNAME[g]}<small>${prev.ivl}d</small></button>`;
       }).join("");
       row+=`<tr><td colspan="8" style="background:var(--surface2)">
-        <div style="font-size:12px;color:var(--ink2);margin-bottom:6px">Solving again now — how did it go? (reschedules next review)</div>
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:6px">solving it again? how did it go (reschedules next review)</div>
         <div class="grades" style="margin-top:0">${btns}</div>
       </td></tr>`;
     }
     return row;
   }).join("");
-  $("tbody").innerHTML = rows || `<tr><td colspan="8" class="empty">No problems yet — add one below.</td></tr>`;
+  $("tbody").innerHTML = rows || `<tr><td colspan="8" class="empty">no problems yet, add one below</td></tr>`;
 }
 window.toggleReview = num=>{ openReview = openReview===num ? null : num; renderTable(); };
 
