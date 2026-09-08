@@ -476,7 +476,8 @@
       <button id="themeBtn" class="theme-btn" title="Toggle light / dark theme" aria-pressed="false"></button>
       <button id="exportBtn">Export</button>
       <button id="importBtn">Import</button>
-      <button id="syncBtn" title="Sync data with private GitHub repo">Sync</button>
+      <button id="loadBtn" title="Load progress from GitHub (start of session)">Load</button>
+      <button id="saveBtn" title="Save progress to GitHub (end of session)">Save</button>
       <input type="file" id="importFile" accept=".json" style="display:none">
     </div>
   </header>
@@ -566,7 +567,7 @@
     </table></div>
   </div>
 
-  <footer>FSRS-5 scheduler · target retention 95% · max interval 60d · data lives in this browser (localStorage) — Sync pushes it to your private GitHub repo</footer>
+  <footer>FSRS-5 scheduler · target retention 95% · max interval 60d · data lives in this browser (localStorage) — Load/Save syncs it with your private GitHub repo</footer>
 </div>
 </div>
 <div id="hmTip"></div>
@@ -651,44 +652,53 @@ function load(){
   try{ const raw = localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(!d.notes) d.notes={}; if(!d.badges) d.badges={}; if(typeof d.spins!=="number") d.spins=0; return d; } }catch(e){}
   return seed();
 }
-const save = ()=>{ localStorage.setItem(KEY, JSON.stringify(state)); ghPush(); };
+const save = ()=> localStorage.setItem(KEY, JSON.stringify(state));
 state = load();
 
-/* GitHub sync — data.json in private repo. Remote wins on open, local wins on save.
-   ponytail: last-write-wins, no merge; add updated-at compare if two machines edit offline */
-const GH = { KEY:"lc-gh-sync", REPO:"JustinasLaunikonis/leetcode-tracker", PATH:"data.json", BRANCH:"data", sha:null, t:0 };
+/* GitHub sync — manual. Load = pull data.json (start of session), Save = push (end of session).
+   ponytail: last-write-wins, no merge; Load overwrites local, Save overwrites remote */
+const GH = { KEY:"lc-gh-sync", REPO:"JustinasLaunikonis/leetcode-tracker", PATH:"data.json", BRANCH:"data" };
 const ghCfg = ()=>{ try{ return JSON.parse(localStorage.getItem(GH.KEY)||"null"); }catch(e){ return null; } };
 const ghUrl = c=>`https://api.github.com/repos/${c.repo}/contents/${GH.PATH}?ref=${GH.BRANCH}`;
 const ghHdr = c=>({ Authorization:"Bearer "+c.token, Accept:"application/vnd.github+json" });
-const ghStatus = m=>{ const b=document.getElementById("syncBtn"); if(b) b.textContent=m; };
-async function ghPull(){
-  const c=ghCfg(); if(!c) return;
-  ghStatus("Sync…");
+const ghStatus = (id,m)=>{ const b=document.getElementById(id); if(!b) return; const t=b.dataset.label||(b.dataset.label=b.textContent); b.textContent=m; if(m!==t) setTimeout(()=>b.textContent=t,2500); };
+function ghToken(){
+  let c=ghCfg(); if(c) return c;
+  const token=prompt("GitHub fine-grained token (Contents: read/write on "+GH.REPO+"):","");
+  if(!token) return null;
+  c={repo:GH.REPO, token}; localStorage.setItem(GH.KEY, JSON.stringify(c)); return c;
+}
+async function ghGet(c){
+  const r=await fetch(ghUrl(c),{headers:ghHdr(c),cache:"no-store"});
+  if(r.status===404) return null;
+  if(!r.ok) throw new Error("GET "+r.status);
+  return r.json();
+}
+async function ghLoad(){
+  const c=ghToken(); if(!c) return;
+  ghStatus("loadBtn","Loading…");
   try{
-    const r=await fetch(ghUrl(c),{headers:ghHdr(c),cache:"no-store"});
-    if(r.status===404){ GH.sha=null; ghStatus("Sync ✓"); ghPush(); return; }
-    if(!r.ok) throw new Error(r.status);
-    const j=await r.json(); GH.sha=j.sha;
+    const j=await ghGet(c);
+    if(!j) throw new Error("no data.json yet — Save first");
     const d=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(j.content.replace(/\n/g,"")),ch=>ch.charCodeAt(0))));
-    if(Array.isArray(d.problems)){ state=d; localStorage.setItem(KEY, JSON.stringify(state)); if(typeof renderAll==="function") renderAll(); }
-    ghStatus("Sync ✓");
-  }catch(e){ ghStatus("Sync ✗"); console.error("gh pull",e); }
+    if(!Array.isArray(d.problems)) throw new Error("bad data");
+    if(!d.notes) d.notes={}; if(!d.badges) d.badges={}; if(typeof d.spins!=="number") d.spins=0;
+    state=d; save(); renderAll(); ghStatus("loadBtn","Loaded ✓");
+  }catch(e){ ghStatus("loadBtn","Load ✗"); alert("Load failed: "+e.message); }
 }
-function ghPush(){
-  const c=ghCfg(); if(!c) return;
-  clearTimeout(GH.t);
-  GH.t=setTimeout(async()=>{
-    ghStatus("Sync…");
-    try{
-      const body={ message:"tracker: update data", branch:GH.BRANCH, content:btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2)))) };
-      if(GH.sha) body.sha=GH.sha;
-      const r=await fetch(ghUrl(c),{method:"PUT",headers:ghHdr(c),body:JSON.stringify(body)});
-      if(!r.ok) throw new Error(r.status);
-      GH.sha=(await r.json()).content.sha; ghStatus("Sync ✓");
-    }catch(e){ ghStatus("Sync ✗"); console.error("gh push",e); }
-  },1500);
+async function ghSave(){
+  const c=ghToken(); if(!c) return;
+  ghStatus("saveBtn","Saving…");
+  try{
+    const cur=await ghGet(c);
+    const body={ message:"tracker: save "+new Date().toISOString().slice(0,16), branch:GH.BRANCH,
+      content:btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2)))) };
+    if(cur) body.sha=cur.sha;
+    const r=await fetch(ghUrl(c),{method:"PUT",headers:ghHdr(c),body:JSON.stringify(body)});
+    if(!r.ok) throw new Error("PUT "+r.status);
+    ghStatus("saveBtn","Saved ✓");
+  }catch(e){ ghStatus("saveBtn","Save ✗"); alert("Save failed: "+e.message+(String(e.message).includes("401")?" — token wrong/expired. Shift+click Save to reset it.":"")); }
 }
-ghPull();
 // re-derive due dates from stability so retention/interval changes apply to existing cards
 for (const p of state.problems){
   const c=p.card, ivl=nextInterval(c.S);
@@ -1272,14 +1282,8 @@ $("exportBtn").onclick=()=>{
   a.download="leetcode-fsrs-backup-"+dkey(new Date())+".json"; a.click();
 };
 $("importBtn").onclick=()=>$("importFile").click();
-$("syncBtn").onclick=()=>{
-  const c=ghCfg()||{repo:GH.REPO};
-  const token=prompt("GitHub fine-grained token (Contents: read/write on "+c.repo+"). Empty = disable sync.", c.token||"");
-  if(token===null) return;
-  if(!token){ localStorage.removeItem(GH.KEY); ghStatus("Sync"); return; }
-  localStorage.setItem(GH.KEY, JSON.stringify({repo:c.repo, token}));
-  GH.sha=null; ghPull();
-};
+$("loadBtn").onclick=ghLoad;
+$("saveBtn").onclick=e=>{ if(e.shiftKey){ localStorage.removeItem(GH.KEY); alert("Token cleared."); return; } ghSave(); };
 $("importFile").onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   f.text().then(t=>{
