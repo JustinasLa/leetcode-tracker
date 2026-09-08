@@ -656,9 +656,9 @@ state = load();
 
 /* GitHub sync — data.json in private repo. Remote wins on open, local wins on save.
    ponytail: last-write-wins, no merge; add updated-at compare if two machines edit offline */
-const GH = { KEY:"lc-gh-sync", REPO:"JustinasLaunikonis/leetcode-tracker", PATH:"data.json", sha:null, t:0 };
+const GH = { KEY:"lc-gh-sync", REPO:"JustinasLaunikonis/leetcode-tracker", PATH:"data.json", BRANCH:"data", sha:null, t:0 };
 const ghCfg = ()=>{ try{ return JSON.parse(localStorage.getItem(GH.KEY)||"null"); }catch(e){ return null; } };
-const ghUrl = c=>`https://api.github.com/repos/${c.repo}/contents/${GH.PATH}`;
+const ghUrl = c=>`https://api.github.com/repos/${c.repo}/contents/${GH.PATH}?ref=${GH.BRANCH}`;
 const ghHdr = c=>({ Authorization:"Bearer "+c.token, Accept:"application/vnd.github+json" });
 const ghStatus = m=>{ const b=document.getElementById("syncBtn"); if(b) b.textContent=m; };
 async function ghPull(){
@@ -680,7 +680,7 @@ function ghPush(){
   GH.t=setTimeout(async()=>{
     ghStatus("Sync…");
     try{
-      const body={ message:"tracker: update data", content:btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2)))) };
+      const body={ message:"tracker: update data", branch:GH.BRANCH, content:btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2)))) };
       if(GH.sha) body.sha=GH.sha;
       const r=await fetch(ghUrl(c),{method:"PUT",headers:ghHdr(c),body:JSON.stringify(body)});
       if(!r.ok) throw new Error(r.status);
