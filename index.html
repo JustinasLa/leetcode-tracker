@@ -656,7 +656,7 @@ state = load();
 
 /* GitHub sync — data.json in private repo. Remote wins on open, local wins on save.
    ponytail: last-write-wins, no merge; add updated-at compare if two machines edit offline */
-const GH = { KEY:"lc-gh-sync", REPO:"JustinasLa/leetcode-tracker", PATH:"data.json", sha:null, t:0 };
+const GH = { KEY:"lc-gh-sync", REPO:"JustinasLaunikonis/leetcode-tracker", PATH:"data.json", sha:null, t:0 };
 const ghCfg = ()=>{ try{ return JSON.parse(localStorage.getItem(GH.KEY)||"null"); }catch(e){ return null; } };
 const ghUrl = c=>`https://api.github.com/repos/${c.repo}/contents/${GH.PATH}`;
 const ghHdr = c=>({ Authorization:"Bearer "+c.token, Accept:"application/vnd.github+json" });
