@@ -1250,6 +1250,48 @@
           "g": 2
         }
       ]
+    },
+    {
+      "num": 271,
+      "title": "Encode and Decode Strings",
+      "url": "https://leetcode.com/problems/encode-and-decode-strings/",
+      "added": 1792867474679,
+      "card": {
+        "S": 3.173,
+        "D": 5.282434422319005,
+        "last": 1792867474679,
+        "due": 1792953874679,
+        "reps": 1,
+        "lapses": 0,
+        "ivl": 1
+      },
+      "history": [
+        {
+          "t": 1792867474679,
+          "g": 3
+        }
+      ]
+    },
+    {
+      "num": 36,
+      "title": "Valid Sudoku",
+      "url": "https://leetcode.com/problems/valid-sudoku/",
+      "added": 1792870414302,
+      "card": {
+        "S": 3.173,
+        "D": 5.282434422319005,
+        "last": 1792870414302,
+        "due": 1792956814302,
+        "reps": 1,
+        "lapses": 0,
+        "ivl": 1
+      },
+      "history": [
+        {
+          "t": 1792870414302,
+          "g": 3
+        }
+      ]
     }
   ],
   "activity": {
@@ -1275,7 +1317,8 @@
     "2026-09-07": 4,
     "2026-09-08": 9,
     "2026-09-10": 1,
-    "2026-10-22": 6
+    "2026-10-22": 6,
+    "2026-10-24": 2
   },
   "notes": {
     "1": "",
@@ -1283,6 +1326,7 @@
     "15": "",
     "20": "",
     "21": "",
+    "36": "",
     "39": "",
     "49": "",
     "74": "",
@@ -1292,6 +1336,7 @@
     "104": "",
     "121": "",
     "125": "",
+    "128": "",
     "141": "",
     "155": "",
     "167": "",
@@ -1300,6 +1345,7 @@
     "226": "",
     "238": "",
     "242": "",
+    "271": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class EncodeAndDecodeStrings271\n{\n    private static final char DELIMITER = '#';\n\n    public String encode(List<String> strs)\n    {\n        StringBuilder encoded = new StringBuilder();\n        for (String str : strs)\n        {\n            encoded.append(str.length()).append(DELIMITER).append(str);\n        }\n        return encoded.toString();\n    }\n\n    public List<String> decode(String str)\n    {\n        List<String> decoded = new ArrayList<>();\n        int i = 0;\n        while (i < str.length())\n        {\n            int j = i;\n            while (str.charAt(j) != DELIMITER) j++;\n            int length = Integer.parseInt(str.substring(i, j));\n            int start = j + 1;\n            int end = start + length;\n\n            decoded.add(str.substring(start, end));\n        }\n        return decoded;\n    }\n}",
     "347": "",
     "572": "",
     "703": "",
