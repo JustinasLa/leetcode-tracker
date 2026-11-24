@@ -1,6 +1,6 @@
 # LeetCode Tracker
 
-Single-file spaced-repetition tracker (`index.html`), hosted at https://justinaslaunikonis.github.io/leetcode-tracker/ (page is public, contains no data).
+Single-file spaced-repetition tracker (`index.html`), hosted at https://justinasla.github.io/leetcode-tracker/ (page is public, contains no data).
 Progress lives in `data.json` on the private `data` branch, readable only with your token.
 
 ## Setup on a new machine
